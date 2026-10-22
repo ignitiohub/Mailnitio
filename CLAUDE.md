@@ -1,11 +1,42 @@
-# Mailnitio: engineering brief
+# CLAUDE.md: Mailnitio
+
+This file is loaded automatically by Claude Code in every session. It holds the engineering brief
+(Prompt 0), the branching and PR rules, and imports the design system (Prompt 0D). Follow all of it for
+every piece of work in this repo.
 
 You are a senior full-stack engineer building MAILNITIO, a multi-tenant email operations platform.
 Never use the old name "MailCart".
 
-UI work must follow the design system in [docs/design-system.md](docs/design-system.md), including its
-design QA checklist. The Stitch prompt and reference mockups are in
-[docs/design/stitch-brief.md](docs/design/stitch-brief.md).
+## Key documents (read the relevant one before starting a task)
+| Document | Use it for |
+|---|---|
+| `docs/specs/mailnitio-platform-plan.md` | Platform architecture, products, data model, phases with requirement IDs + acceptance criteria |
+| `docs/specs/mailnitio-middleware-spec.md` | AI agent engine, pipeline, threading, agents, connectors (Graph, Dataverse), training/Knowledge Pack |
+| `docs/prompts/mailnitio-dev-prompts.md` | Phase build prompts (D1–D4 now, POC-1..4 later), Stitch design prompts, acceptance checklists |
+| `docs/design-system.md` | Design system & UX standards (imported in full at the end of this file) |
+| `docs/design/stitch-brief.md` | Stitch prompt and reference mockups (`docs/design/reference/`) |
+| `docs/decisions.md` | Log every non-trivial decision (date, decision, reason, alternatives, phase) |
+
+## How to work
+- Current focus: **Part A (Demo MVP), tasks D1 → D4** in `docs/prompts/mailnitio-dev-prompts.md`. Do not
+  build POC items (CRM connectors, full training runs) unless asked.
+- Work task by task, in small, reviewable commits.
+- Before marking a task done: run tests, tick its acceptance checklist and the design QA checklist, and
+  note anything deferred in `docs/decisions.md`.
+- If a spec is ambiguous, pick the simplest option consistent with the rules below and log it.
+
+## Branching & pull requests (mandatory)
+- **Never commit or push directly to `main`.** `main` is production: it only changes by merging a
+  reviewed pull request.
+- Every change (features, fixes, docs, config) starts on a new branch from an up-to-date `main`:
+  `git checkout main && git pull && git checkout -b <type>/<short-name>`.
+  Types: `feat/` (e.g. `feat/d1-auth-workspaces`), `fix/`, `docs/`, `chore/`, `refactor/`, `test/`.
+- Develop and test on the branch: typecheck, lint, unit/integration tests and a manual run of the
+  affected screens or endpoints must pass before opening the PR. Do not open a PR with failing checks.
+- Open a pull request to `main` for every branch. The PR description states what changed, why, how it
+  was tested, the acceptance/design QA checklist status, and anything deferred.
+- Merge only after review and green checks. Prefer squash merge; delete the branch after merging.
+- If a change is found broken after merging, fix it on a new branch and PR, never with a direct push.
 
 ## Products
 - **Mailnitio Helpdesk** (product 1): AI email customer service. Two modes sharing one AI agent engine:
@@ -48,18 +79,26 @@ design QA checklist. The Stitch prompt and reference mockups are in
 10. Write tests for: RLS isolation, idempotency, router decision table, thread resolver, PII masking.
 
 ## Conventions
-- Folder layout: see mailnitio-platform-plan.md §5. Ticket keys: MN-<number> per workspace.
+- Folder layout: see `docs/specs/mailnitio-platform-plan.md` §5. Ticket keys: MN-<number> per workspace.
 - API: /v1/... JSON, zod schemas, cursor pagination, errors { error: { code, message } }.
 - Roles: owner, admin, supervisor, agent, reviewer, viewer (+ developer, marketer for Send).
 - Status chips: Processed, Rerouted, Needs Review, Escalated, Shadow, Skipped, Failed.
 - Small, reviewable commits; update docs/specs when behaviour changes.
 
 ## Reference docs
-mailnitio-platform-plan.md, mailnitio-middleware-spec.md (sections cited in each prompt).
-When something is ambiguous, choose the simplest option consistent with these rules and note it in
-docs/decisions.md.
+`docs/specs/mailnitio-platform-plan.md`, `docs/specs/mailnitio-middleware-spec.md` (sections cited in each
+prompt). When something is ambiguous, choose the simplest option consistent with these rules and note it
+in `docs/decisions.md`.
 
 ## Repo / git
 - `origin` is `git@github-ignitiohub:ignitiohub/Mailnitio.git` (SSH alias for the ignitiohub account in
   ~/.ssh/config). Do not switch it back to HTTPS; the Windows credential manager holds a different account.
 - Commit identity for this repo: ignitiohub <ignitiohub@gmail.com>.
+
+---
+
+## Design system & UX standards (Prompt 0D)
+All UI work (every screen, component and page) must follow the design system, including its design QA
+checklist. The Stitch prompt and reference mockups are in `docs/design/stitch-brief.md`.
+
+@docs/design-system.md
