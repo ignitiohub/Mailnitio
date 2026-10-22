@@ -40,6 +40,7 @@ export const leadRoutes =
               interest: lead.interest ?? null,
               message: lead.message || null,
               source: lead.source ?? null,
+              utm: lead.utm ?? {},
               preferredSlot: preferredSlot ? new Date(preferredSlot) : null,
             })
             .returning({ id: schema.leads.id }),

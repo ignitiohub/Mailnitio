@@ -94,6 +94,10 @@ export const leads = pgTable(
     message: text("message"),
     preferredSlot: timestamp("preferred_slot", { withTimezone: true }),
     source: text("source"),
+    /** UTM parameters captured on the visitor's first page view. */
+    utm: jsonb("utm").$type<Record<string, string>>().notNull().default(sql`'{}'::jsonb`),
+    /** Sales pipeline: new → contacted → demo → poc → won | lost. */
+    status: text("status").notNull().default("new"),
     /** Delivery flags so the notification job is idempotent across retries. */
     teamNotifiedAt: timestamp("team_notified_at", { withTimezone: true }),
     requesterNotifiedAt: timestamp("requester_notified_at", { withTimezone: true }),

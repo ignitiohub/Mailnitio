@@ -16,6 +16,7 @@ import { useSearchParams } from "next/navigation";
 import { type FormEvent, useCallback, useMemo, useState } from "react";
 import { Turnstile, turnstileEnabled } from "@/components/turnstile";
 import { ApiError, apiFetch, fieldErrors } from "@/lib/api";
+import { readUtm } from "@/lib/utm";
 import { upcomingDemoDays } from "./slots";
 
 type FormValues = Record<
@@ -103,6 +104,7 @@ export function DemoForm() {
       message: values.message || undefined,
       preferredSlot: slot ?? undefined,
       source: params.get("plan") ?? params.get("offer") ?? params.get("industry") ?? undefined,
+      utm: readUtm(),
       captchaToken: captcha,
     };
 

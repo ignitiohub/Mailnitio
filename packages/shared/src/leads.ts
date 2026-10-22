@@ -43,6 +43,16 @@ export const leadInputSchema = z.object({
   message: z.string().trim().max(2000).optional(),
   preferredSlot: z.string().datetime({ offset: true }).optional(),
   source: z.string().trim().max(120).optional(),
+  utm: z
+    .object({
+      source: z.string().max(120),
+      medium: z.string().max(120),
+      campaign: z.string().max(120),
+      term: z.string().max(120),
+      content: z.string().max(120),
+    })
+    .partial()
+    .optional(),
   captchaToken: z.string().max(4096).default(""),
 });
 
