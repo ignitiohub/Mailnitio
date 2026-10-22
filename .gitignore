@@ -1,13 +1,47 @@
+# Dependencies
 node_modules/
-dist/
-.next/
-.turbo/
-coverage/
-*.tsbuildinfo
+.pnpm-store/
+
+# Environment and secrets (commit .env.example only)
 .env
 .env.*
 !.env.example
+
+# Build output
+dist/
+build/
+out/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Tests and coverage
+coverage/
+
+# Logs
+*.log
+logs/
+
+# OS and editors
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Local development (D1)
 .vercel
 next-env.d.ts
 install.log
