@@ -1,24 +1,40 @@
 /**
  * Pricing is edited ONLY here. The pricing page, plan tables and usage calculator all read this file.
  *
- * DRAFT: figures are placeholders until the commercial brief (§4) is confirmed. See docs/decisions.md.
- * NGN and USD prices are set explicitly per plan (no live FX conversion).
+ * Figures follow docs/prompts/mailnitio-dev-prompts.md §4 and docs/specs/mailnitio-platform-plan.md §34.
+ * They are proposals to validate with early customers. Prices are in US dollars; naira invoicing uses a
+ * local price list (Paystack), so there is no live FX conversion here.
  */
 
-export type Currency = "NGN" | "USD";
-export type Money = Record<Currency, number>;
+/** A price that is still a proposal is shown as a range, e.g. $12–15. */
+export interface PriceRange {
+  min: number;
+  max: number;
+}
+
+export type PlanBasis =
+  /** Price per agent per month (native Helpdesk: the team works inside Mailnitio). */
+  | "per_agent"
+  /** Fixed price per month (Middleware, Send). */
+  | "flat"
+  /** Free trial (Pilot): not a monthly plan, so the calculator never recommends it. */
+  | "trial"
+  /** Priced per customer. */
+  | "custom";
 
 export interface Plan {
   id: string;
   name: string;
   summary: string;
-  /** Monthly platform fee; null means custom pricing (talk to sales). */
-  monthlyFee: Money | null;
-  /** Emails included in the monthly fee. */
-  includedEmails: number;
-  /** Price per email above the included volume; null when not self-serve. */
-  overagePerEmail: Money | null;
-  limits: string[];
+  basis: PlanBasis;
+  /** USD per agent per month or per month; null for trials and custom plans. */
+  price: PriceRange | null;
+  /** Shown instead of a computed price, e.g. "Free for 30 days" or "From $2,000 a month". */
+  priceLabel?: string;
+  /** Emails included per month; null means no fixed limit is published. */
+  includedEmails: number | null;
+  /** USD per email above the included volume; null means the plan does not allow overage. */
+  overagePerEmail: PriceRange | null;
   features: string[];
   cta: { label: string; href: string };
   highlighted?: boolean;
@@ -32,6 +48,8 @@ export interface PricingTab {
   unit: string;
   intro: string;
   plans: Plan[];
+  /** Extra one-off or optional items shown under the plans. */
+  notes: { title: string; body: string }[];
 }
 
 export const pricingTabs: PricingTab[] = [
@@ -40,61 +58,77 @@ export const pricingTabs: PricingTab[] = [
     label: "Helpdesk (native)",
     unit: "processed email",
     intro:
-      "Tickets live in Mailnitio. Your team works in our inbox and replies go out from your own mailbox. Agent seats are included.",
+      "Your team works tickets in Mailnitio and replies go out from your own mailbox. Priced per agent, with AI routing included up to each plan's monthly email volume.",
     plans: [
+      {
+        id: "hd-pilot",
+        name: "Pilot",
+        summary: "Prove it on your own emails before you commit.",
+        basis: "trial",
+        price: null,
+        priceLabel: "Free for 30 days",
+        includedEmails: 5_000,
+        overagePerEmail: null,
+        features: ["1 mailbox", "Up to 5,000 emails", "Shadow mode", "Insight report on your email mix"],
+        cta: { label: "Start a pilot", href: "/demo?plan=hd-pilot" },
+      },
       {
         id: "hd-starter",
         name: "Starter",
         summary: "For a single support team getting started with AI routing.",
-        monthlyFee: { NGN: 150_000, USD: 99 },
-        includedEmails: 5_000,
-        overagePerEmail: { NGN: 15, USD: 0.01 },
-        limits: ["Up to 3 mailboxes", "Up to 10 agent seats"],
+        basis: "per_agent",
+        price: { min: 12, max: 15 },
+        includedEmails: 2_000,
+        overagePerEmail: null,
         features: [
-          "AI routing and ticket creation",
-          "Threading and customer matching",
-          "Acknowledgement emails",
-          "Team inbox with SLAs",
-          "Needs Review queue",
-          "Shadow mode",
+          "1 mailbox",
+          "Tickets, assignment and canned responses",
+          "AI routing and acknowledgements on up to 2,000 emails a month",
+          "Basic reports",
         ],
         cta: { label: "Book a demo", href: "/demo?plan=hd-starter" },
       },
       {
         id: "hd-growth",
         name: "Growth",
-        summary: "For multi-team support operations with higher volumes.",
-        monthlyFee: { NGN: 450_000, USD: 299 },
-        includedEmails: 25_000,
-        overagePerEmail: { NGN: 12, USD: 0.008 },
-        limits: ["Up to 10 mailboxes", "Unlimited agent seats"],
+        summary: "For multi-team support operations.",
+        basis: "per_agent",
+        price: { min: 25, max: 35 },
+        includedEmails: 10_000,
+        overagePerEmail: { min: 0.02, max: 0.02 },
         features: [
-          "Everything in Starter",
-          "Training on your email history",
-          "Custom categories and routing rules",
-          "Supervisor dashboards",
-          "Audit log export",
-          "Bring your own AI key",
+          "5 mailboxes",
+          "Teams and SLAs",
+          "Outlook sync",
+          "AI suggested replies and knowledge-base answers",
+          "Up to 10,000 emails a month, then about $0.02 per email",
         ],
         cta: { label: "Book a demo", href: "/demo?plan=hd-growth" },
         highlighted: true,
       },
       {
-        id: "hd-enterprise",
-        name: "Enterprise",
-        summary: "For regulated organisations with custom requirements.",
-        monthlyFee: null,
-        includedEmails: 0,
+        id: "hd-business",
+        name: "Business",
+        summary: "For larger teams that want AI trained on their history.",
+        basis: "per_agent",
+        price: { min: 45, max: 60 },
+        includedEmails: 30_000,
         overagePerEmail: null,
-        limits: ["Unlimited mailboxes", "Unlimited agent seats"],
         features: [
-          "Everything in Growth",
-          "Customer-hosted option",
-          "Single sign-on and custom data retention",
-          "Dedicated success manager",
-          "Uptime SLA",
+          "Unlimited mailboxes",
+          "Advanced reports",
+          "Training on your email history (Knowledge Pack)",
+          "API and webhooks",
+          "Up to 30,000 emails a month",
+          "Bring your own AI key option",
         ],
-        cta: { label: "Talk to sales", href: "/demo?plan=hd-enterprise" },
+        cta: { label: "Book a demo", href: "/demo?plan=hd-business" },
+      },
+    ],
+    notes: [
+      {
+        title: "Bring your own AI key",
+        body: "Use your own Azure OpenAI, Claude or Gemini key and save 20–30% on AI usage.",
       },
     ],
   },
@@ -103,59 +137,69 @@ export const pricingTabs: PricingTab[] = [
     label: "Helpdesk (middleware)",
     unit: "processed email",
     intro:
-      "Keep working in Dynamics 365 or Salesforce. Mailnitio's AI creates and updates cases in your CRM, with no extra seats to buy.",
+      "Your team keeps working in Dynamics 365 or Salesforce. Mailnitio's AI creates and updates cases in your CRM. Priced per email, because your agents work in the CRM.",
     plans: [
       {
-        id: "mw-connect",
-        name: "Connect",
-        summary: "One CRM environment and the mailboxes that feed it.",
-        monthlyFee: { NGN: 250_000, USD: 169 },
-        includedEmails: 10_000,
-        overagePerEmail: { NGN: 14, USD: 0.009 },
-        limits: ["1 CRM environment", "Up to 5 mailboxes"],
+        id: "mw-byok",
+        name: "Middleware BYOK",
+        summary: "Use your own AI provider key; AI usage is billed by your provider.",
+        basis: "flat",
+        price: { min: 500, max: 500 },
+        includedEmails: 30_000,
+        overagePerEmail: { min: 0.02, max: 0.02 },
         features: [
-          "Case creation and updates in your CRM",
-          "Duplicate case prevention",
-          "Queue routing by content",
-          "Customer matching against CRM contacts",
-          "Shadow mode",
+          "Up to 30,000 processed emails a month",
+          "5 mailboxes",
+          "1 CRM connector",
+          "AI review portal",
         ],
-        cta: { label: "Book a demo", href: "/demo?plan=mw-connect" },
+        cta: { label: "Book a POC", href: "/demo?plan=mw-byok" },
       },
       {
-        id: "mw-scale",
-        name: "Scale",
-        summary: "Several queues and business units on one CRM.",
-        monthlyFee: { NGN: 750_000, USD: 499 },
-        includedEmails: 50_000,
-        overagePerEmail: { NGN: 10, USD: 0.0065 },
-        limits: ["Up to 3 CRM environments", "Up to 20 mailboxes"],
+        id: "mw-managed",
+        name: "Middleware Managed AI",
+        summary: "Everything in BYOK, with AI included.",
+        basis: "flat",
+        price: { min: 1_000, max: 1_000 },
+        includedEmails: 30_000,
+        overagePerEmail: { min: 0.03, max: 0.03 },
         features: [
-          "Everything in Connect",
-          "Training on your case history",
-          "Escalation rules and SLAs",
-          "Audit log export",
-          "Bring your own AI key",
+          "Up to 30,000 processed emails a month",
+          "5 mailboxes",
+          "1 CRM connector",
+          "AI review portal",
+          "AI usage included",
         ],
-        cta: { label: "Book a demo", href: "/demo?plan=mw-scale" },
+        cta: { label: "Book a POC", href: "/demo?plan=mw-managed" },
         highlighted: true,
       },
       {
         id: "mw-enterprise",
         name: "Enterprise",
-        summary: "Custom CRM integrations and deployment options.",
-        monthlyFee: null,
-        includedEmails: 0,
+        summary: "High volumes, several CRMs and enterprise controls.",
+        basis: "custom",
+        price: null,
+        priceLabel: "From $2,000 a month",
+        includedEmails: null,
         overagePerEmail: null,
-        limits: ["Unlimited environments", "Unlimited mailboxes"],
         features: [
-          "Everything in Scale",
-          "Customer-hosted option",
-          "Custom CRM objects and fields",
-          "Dedicated success manager",
-          "Uptime SLA",
+          "Unlimited mailboxes",
+          "150,000+ emails a month",
+          "Customer-hosted option and SSO",
+          "SLA and priority support",
+          "Quarterly retraining and auto-response",
         ],
         cta: { label: "Talk to sales", href: "/demo?plan=mw-enterprise" },
+      },
+    ],
+    notes: [
+      {
+        title: "Onboarding: $2,000–5,000 one-time",
+        body: "CRM integration, training on your historical emails, Knowledge Pack, shadow run and go-live.",
+      },
+      {
+        title: "Proof of concept: free or credited",
+        body: "2–4 weeks in your CRM sandbox, free or credited against onboarding if you go ahead.",
       },
     ],
   },
@@ -163,83 +207,90 @@ export const pricingTabs: PricingTab[] = [
     id: "send",
     label: "Send",
     unit: "email sent",
-    intro:
-      "Templates, audiences and bulk sends on infrastructure tuned for inbox placement. Pay for what you send.",
+    intro: "Templates, audiences and bulk sends on infrastructure tuned for inbox placement.",
     plans: [
       {
-        id: "send-payg",
-        name: "Pay as you go",
-        summary: "No monthly fee. Pay per email sent.",
-        monthlyFee: { NGN: 0, USD: 0 },
-        includedEmails: 0,
-        overagePerEmail: { NGN: 2.5, USD: 0.0018 },
-        limits: ["1 sending domain", "Up to 5,000 contacts"],
+        id: "send-free",
+        name: "Free",
+        summary: "For trying Send and low-volume notifications.",
+        basis: "flat",
+        price: { min: 0, max: 0 },
+        includedEmails: 3_000,
+        overagePerEmail: null,
         features: [
-          "Template editor",
-          "Audiences and lists",
-          "Bulk sends with a live monitor",
-          "SPF, DKIM and DMARC checks",
+          "3,000 emails a month (100 a day)",
+          "1 sending domain",
+          "API and templates",
+          "Mailnitio branding in marketing footers",
         ],
-        cta: { label: "Book a demo", href: "/demo?plan=send-payg" },
+        cta: { label: "Join the waitlist", href: "/demo?plan=send-free&interest=Send" },
+      },
+      {
+        id: "send-starter",
+        name: "Starter",
+        summary: "For regular transactional and notice sends.",
+        basis: "flat",
+        price: { min: 10, max: 15 },
+        includedEmails: 20_000,
+        overagePerEmail: { min: 0.0004, max: 0.0008 },
+        features: ["20,000 emails a month", "3 sending domains", "Webhooks", "30-day logs"],
+        cta: { label: "Join the waitlist", href: "/demo?plan=send-starter&interest=Send" },
       },
       {
         id: "send-growth",
         name: "Growth",
-        summary: "A monthly bundle for regular campaigns.",
-        monthlyFee: { NGN: 400_000, USD: 279 },
-        includedEmails: 200_000,
-        overagePerEmail: { NGN: 2, USD: 0.0014 },
-        limits: ["Up to 5 sending domains", "Up to 100,000 contacts"],
-        features: [
-          "Everything in Pay as you go",
-          "Scheduled sends",
-          "Automatic suppression of bounces and complaints",
-          "Deliverability reports",
-        ],
-        cta: { label: "Book a demo", href: "/demo?plan=send-growth" },
+        summary: "For campaigns to your customer base.",
+        basis: "flat",
+        price: { min: 35, max: 50 },
+        includedEmails: 100_000,
+        overagePerEmail: { min: 0.0004, max: 0.0008 },
+        features: ["100,000 emails a month", "Campaigns and A/B tests", "10,000 contacts", "90-day logs"],
+        cta: { label: "Join the waitlist", href: "/demo?plan=send-growth&interest=Send" },
         highlighted: true,
       },
       {
-        id: "send-enterprise",
-        name: "Enterprise",
-        summary: "High-volume and regulated sending.",
-        monthlyFee: null,
-        includedEmails: 0,
+        id: "send-scale",
+        name: "Scale",
+        summary: "For high-volume senders.",
+        basis: "custom",
+        price: null,
+        priceLabel: "From about $150 a month",
+        includedEmails: null,
         overagePerEmail: null,
-        limits: ["Unlimited domains", "Unlimited contacts"],
-        features: [
-          "Everything in Growth",
-          "Dedicated IP addresses",
-          "IP warm-up plan",
-          "Dedicated success manager",
-        ],
-        cta: { label: "Talk to sales", href: "/demo?plan=send-enterprise" },
+        features: ["500,000+ emails a month", "Dedicated IP option", "Priority support"],
+        cta: { label: "Talk to sales", href: "/demo?plan=send-scale&interest=Send" },
+      },
+    ],
+    notes: [
+      {
+        title: "Overage: about $0.40–0.80 per 1,000 emails",
+        body: "On Starter and Growth, emails above your monthly volume are charged per thousand.",
       },
     ],
   },
 ];
 
 export const pocOffer = {
-  title: "Start with a 30-day proof of concept",
-  body: "Run Mailnitio in shadow mode on one mailbox. We process up to 5,000 emails at no charge and show you how each one would have been routed before anything goes live.",
-  cta: { label: "Book a demo", href: "/demo?offer=poc" },
+  title: "Start with a free 30-day pilot",
+  body: "Run Mailnitio in shadow mode on one mailbox. We process up to 5,000 of your emails and give you an insight report on how each one would have been routed, before anything goes live.",
+  cta: { label: "Start a pilot", href: "/demo?offer=pilot" },
 } as const;
 
 export const pricingFaq: { question: string; answer: string }[] = [
   {
-    question: "What counts as a processed email?",
+    question: "Why is native Helpdesk priced per agent but middleware per email?",
     answer:
-      "Each inbound customer email that Mailnitio reads, classifies and routes counts once. Automatic replies, bounces and emails we skip as spam are not charged.",
+      "With native Helpdesk your team works inside Mailnitio, so pricing follows the number of agents. In middleware mode your team works in your CRM, so pricing follows the emails Mailnitio processes.",
   },
   {
-    question: "Do you charge per agent seat?",
+    question: "What counts as a processed email?",
     answer:
-      "No. Helpdesk plans include agent seats up to the limit shown, and Growth and above include unlimited seats.",
+      "Each inbound customer email that Mailnitio reads, classifies and routes counts once. Automatic replies, bounces and emails skipped as spam are not counted.",
   },
   {
     question: "Can we pay in naira?",
     answer:
-      "Yes. Every plan is priced in naira and US dollars, and invoices are issued in the currency you choose.",
+      "Yes. Prices are shown in US dollars; we invoice in naira from a local price list, reviewed quarterly for exchange-rate moves.",
   },
   {
     question: "What is shadow mode?",
@@ -249,28 +300,45 @@ export const pricingFaq: { question: string; answer: string }[] = [
   {
     question: "Can we use our own AI provider key?",
     answer:
-      "Yes, on Growth and above. With your own key, AI usage is billed by your provider and your Mailnitio platform fee stays the same.",
+      "Yes. On Business and Middleware BYOK you can use your own Azure OpenAI, Claude or Gemini key, so AI processing runs under your own contract and saves 20–30% on AI usage.",
   },
   {
-    question: "What happens if we go over our included volume?",
+    question: "Are these prices final?",
     answer:
-      "Emails above your included volume are charged at your plan's per-email rate. We never stop processing your email because of volume.",
+      "They are our launch prices and may change as we learn from early customers. Your quote and contract always state the price you pay.",
   },
 ];
 
-/** Monthly cost for a plan at a given volume, or null for custom-priced plans. */
-export function estimateMonthlyCost(plan: Plan, emails: number, currency: Currency): number | null {
-  if (!plan.monthlyFee || !plan.overagePerEmail) return null;
-  const overage = Math.max(0, emails - plan.includedEmails) * plan.overagePerEmail[currency];
-  return Math.round((plan.monthlyFee[currency] + overage) * 100) / 100;
+export interface CostEstimate {
+  min: number;
+  max: number;
 }
 
-/** The cheapest self-serve plan for a volume; custom-priced plans are excluded. */
-export function recommendPlan(tab: PricingTab, emails: number, currency: Currency): Plan | null {
+/**
+ * Monthly cost of a plan for a volume (and agents for per-agent plans), or null when the plan cannot be
+ * self-priced: trials, custom plans, or volumes above the included limit without published overage.
+ */
+export function estimateMonthlyCost(
+  plan: Plan,
+  input: { emails: number; agents: number },
+): CostEstimate | null {
+  if (!plan.price || plan.basis === "trial" || plan.basis === "custom") return null;
+  const over = plan.includedEmails === null ? 0 : Math.max(0, input.emails - plan.includedEmails);
+  if (over > 0 && !plan.overagePerEmail) return null;
+  const seats = plan.basis === "per_agent" ? Math.max(1, input.agents) : 1;
+  const round = (n: number) => Math.round(n * 100) / 100;
+  return {
+    min: round(plan.price.min * seats + over * (plan.overagePerEmail?.min ?? 0)),
+    max: round(plan.price.max * seats + over * (plan.overagePerEmail?.max ?? 0)),
+  };
+}
+
+/** The cheapest plan (by upper estimate) that can serve the volume; null means "talk to sales". */
+export function recommendPlan(tab: PricingTab, input: { emails: number; agents: number }): Plan | null {
   let best: { plan: Plan; cost: number } | null = null;
   for (const plan of tab.plans) {
-    const cost = estimateMonthlyCost(plan, emails, currency);
-    if (cost !== null && (best === null || cost < best.cost)) best = { plan, cost };
+    const cost = estimateMonthlyCost(plan, input);
+    if (cost !== null && (best === null || cost.max < best.cost)) best = { plan, cost: cost.max };
   }
   return best?.plan ?? null;
 }

@@ -10,13 +10,13 @@ export default function InboxlogPage() {
   return (
     <ModuleEmpty
       title="Inbox log"
-      description="Every email Mailnitio has read, with the decision it made and why."
+      description="Every email Mailnitio has read, with its category, confidence and decision."
       icon={ScrollText}
       emptyTitle="No emails processed yet"
-      emptyDescription="Each email Mailnitio reads will appear here with its category, confidence and decision trail."
+      emptyDescription="Each email Mailnitio reads will appear here with its decision trail once a mailbox is connected."
       action={
         <Button asChild>
-          <Link href="/app/mailboxes">Connect a mailbox</Link>
+          <Link href="/demo?offer=setup">Request setup</Link>
         </Button>
       }
     />

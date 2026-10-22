@@ -2,16 +2,16 @@ import { Users } from "lucide-react";
 import type { Metadata } from "next";
 import { ModuleEmpty } from "@/components/app/module-empty";
 
-export const metadata: Metadata = { title: "Audiences" };
+export const metadata: Metadata = { title: "Audiences and templates" };
 
-export default function AudiencesPage() {
+export default function AudiencesandtemplatesPage() {
   return (
     <ModuleEmpty
-      title="Audiences"
-      description="Contact lists and segments for your campaigns."
+      title="Audiences and templates"
+      description="Contact lists, segments and the email templates you send to them."
       icon={Users}
       emptyTitle="No audiences yet"
-      emptyDescription="Import contacts from a CSV file to build your first audience."
+      emptyDescription="Send is opening soon. Audiences and templates will appear here when it does."
     />
   );
 }

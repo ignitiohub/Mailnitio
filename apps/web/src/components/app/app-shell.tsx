@@ -18,11 +18,11 @@ import {
 } from "@mailnitio/ui";
 import {
   Bell,
-  Globe,
-  GraduationCap,
+  ChartColumn,
+  Contact,
+  Gauge,
   Inbox,
   LayoutDashboard,
-  LayoutTemplate,
   ListChecks,
   LogOut,
   type LucideIcon,
@@ -33,6 +33,7 @@ import {
   ShieldCheck,
   UserCog,
   Users,
+  Workflow,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -44,16 +45,16 @@ import { useMe } from "@/lib/me";
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
   Inbox,
-  ListChecks,
   ScrollText,
+  ListChecks,
+  Contact,
+  ChartColumn,
   Send,
   Users,
-  LayoutTemplate,
-  GraduationCap,
   Mail,
-  Globe,
+  Workflow,
   UserCog,
-  ShieldCheck,
+  Gauge,
   Settings,
 };
 

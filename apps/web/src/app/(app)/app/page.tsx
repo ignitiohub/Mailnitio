@@ -41,8 +41,8 @@ export default function DashboardPage() {
       loading: members.loading,
       href: "/app/settings/members",
     },
-    ...(helpdesk ? [{ label: "Connect a support mailbox", done: false, href: "/app/mailboxes" }] : []),
-    ...(send ? [{ label: "Verify a sending domain", done: false, href: "/app/domains" }] : []),
+    ...(helpdesk ? [{ label: "Set up a support mailbox", done: false, href: "/app/mailboxes" }] : []),
+    ...(send ? [{ label: "Plan your first campaign", done: false, href: "/app/campaigns" }] : []),
   ];
   const completed = tasks.filter((t) => t.done).length;
 
@@ -54,11 +54,11 @@ export default function DashboardPage() {
         actions={
           helpdesk ? (
             <Button asChild>
-              <Link href="/app/mailboxes">Connect a mailbox</Link>
+              <Link href="/app/mailboxes">Set up a mailbox</Link>
             </Button>
           ) : (
             <Button asChild>
-              <Link href="/app/domains">Add a sending domain</Link>
+              <Link href="/app/campaigns">Go to campaigns</Link>
             </Button>
           )
         }

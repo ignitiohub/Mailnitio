@@ -18,26 +18,36 @@ export const industries: Industry[] = [
     headline: "Route every account, card and transfer query to the right desk",
     summary:
       "Banks, asset managers and fintechs receive thousands of emails about failed transfers, statements, KYC updates and redemptions. Mailnitio reads each one, recognises the customer and opens a ticket with the right team before anyone triages it by hand.",
+    // Categories and escalation terms: industry pack in docs/prompts/mailnitio-dev-prompts.md §6.
     categories: [
       {
-        name: "Failed transfer",
-        example: "My transfer of ₦250,000 on Monday has not arrived",
-        team: "Payments operations",
+        name: "Complaint",
+        example: "This is the third time I am writing about poor service",
+        team: "Customer experience",
       },
+      {
+        name: "Enquiry",
+        example: "What is the minimum investment for your money market fund?",
+        team: "Customer service",
+      },
+      {
+        name: "Redemption",
+        example: "I want to redeem my money market units",
+        team: "Investment operations",
+      },
+      { name: "KYC update", example: "I need to update my BVN and home address", team: "Compliance" },
       {
         name: "Statement request",
         example: "Please send my statement for July to September",
         team: "Customer service",
       },
-      { name: "KYC update", example: "I need to update my BVN and address", team: "Compliance" },
       {
-        name: "Redemption and withdrawal",
-        example: "I want to redeem my money market units",
-        team: "Investment operations",
+        name: "Feedback",
+        example: "Your new mobile app makes top-ups much easier",
+        team: "Customer experience",
       },
-      { name: "Card dispute", example: "There is a charge on my card I do not recognise", team: "Disputes" },
     ],
-    escalationTerms: ["fraud", "unauthorised debit", "CBN complaint", "legal action", "account frozen"],
+    escalationTerms: ["SEC", "CBN", "PenCom", "lawyer", "court", "petition", "press"],
     outcomes: [
       { metric: "94%", label: "of emails routed to the right desk first time" },
       { metric: "0", label: "duplicate tickets when customers follow up" },
@@ -53,28 +63,33 @@ export const industries: Industry[] = [
     summary:
       "Electricity distribution and water companies see email volumes spike during outages. Mailnitio groups related reports, routes billing and metering queries to the right team, and keeps customers informed with acknowledgements.",
     categories: [
+      { name: "Billing dispute", example: "I was charged for units I did not use", team: "Billing" },
       { name: "Outage report", example: "No power on Admiralty Way since 6 am", team: "Network operations" },
-      { name: "Billing dispute", example: "My estimated bill is far higher than usual", team: "Billing" },
-      { name: "Meter request", example: "When will my prepaid meter be installed?", team: "Metering" },
       {
-        name: "Token not loading",
+        name: "Prepaid token issue",
         example: "I bought a token but it will not load",
         team: "Vending support",
       },
+      { name: "Meter request", example: "When will my prepaid meter be installed?", team: "Metering" },
       {
         name: "New connection",
         example: "We need a new connection for our office",
         team: "Customer service",
       },
+      {
+        name: "Estimated billing complaint",
+        example: "My estimated bill is far higher than usual",
+        team: "Billing",
+      },
     ],
-    escalationTerms: ["fire", "exposed cable", "electrocution", "injury", "regulator"],
+    escalationTerms: ["NERC", "lawyer", "court", "petition", "media", "community protest"],
     outcomes: [
       { metric: "3x", label: "faster first response during outage spikes" },
       { metric: "0", label: "duplicate tickets for the same outage report" },
       { metric: "<10s", label: "to acknowledge every customer email" },
     ],
     regulatoryNote:
-      "Safety-related emails are escalated immediately to a named supervisor queue and never wait in a general inbox.",
+      "Emails that mention the regulator, legal action or the media are escalated immediately to a named supervisor queue and never wait in a general inbox.",
   },
   {
     slug: "telecoms",

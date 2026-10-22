@@ -6,38 +6,51 @@ const tab = (id: string) => {
   if (!found) throw new Error(`missing tab ${id}`);
   return found;
 };
+const plan = (tabId: string, planId: string) => {
+  const found = tab(tabId).plans.find((p) => p.id === planId);
+  if (!found) throw new Error(`missing plan ${planId}`);
+  return found;
+};
 
 describe("pricing config", () => {
   it("has the three tabs from the brief", () => {
     expect(pricingTabs.map((t) => t.label)).toEqual(["Helpdesk (native)", "Helpdesk (middleware)", "Send"]);
   });
 
-  it("charges only the fee within the included volume", () => {
-    const starter = tab("helpdesk-native").plans[0]!;
-    expect(estimateMonthlyCost(starter, 4_000, "NGN")).toBe(150_000);
+  it("prices native Helpdesk per agent", () => {
+    expect(estimateMonthlyCost(plan("helpdesk-native", "hd-growth"), { emails: 5_000, agents: 4 })).toEqual({
+      min: 100,
+      max: 140,
+    });
   });
 
   it("adds overage above the included volume", () => {
-    const starter = tab("helpdesk-native").plans[0]!;
-    expect(estimateMonthlyCost(starter, 6_000, "NGN")).toBe(150_000 + 1_000 * 15);
+    expect(
+      estimateMonthlyCost(plan("helpdesk-middleware", "mw-byok"), { emails: 40_000, agents: 1 }),
+    ).toEqual({
+      min: 700,
+      max: 700,
+    });
   });
 
-  it("returns null for custom plans", () => {
-    const enterprise = tab("helpdesk-native").plans.at(-1)!;
-    expect(estimateMonthlyCost(enterprise, 10_000, "NGN")).toBeNull();
+  it("does not price a plan above its limit when it has no published overage", () => {
+    expect(
+      estimateMonthlyCost(plan("helpdesk-native", "hd-starter"), { emails: 3_000, agents: 2 }),
+    ).toBeNull();
   });
 
-  it("recommends the cheapest self-serve plan for a volume", () => {
-    expect(recommendPlan(tab("helpdesk-native"), 2_000, "NGN")?.id).toBe("hd-starter");
-    expect(recommendPlan(tab("helpdesk-native"), 60_000, "NGN")?.id).toBe("hd-growth");
-    expect(recommendPlan(tab("send"), 1_000, "USD")?.id).toBe("send-payg");
+  it("never prices trials or custom plans", () => {
+    expect(estimateMonthlyCost(plan("helpdesk-native", "hd-pilot"), { emails: 100, agents: 1 })).toBeNull();
+    expect(
+      estimateMonthlyCost(plan("helpdesk-middleware", "mw-enterprise"), { emails: 100, agents: 1 }),
+    ).toBeNull();
   });
 
-  it("gives every plan both currencies or neither", () => {
-    for (const t of pricingTabs) {
-      for (const plan of t.plans) {
-        expect(plan.monthlyFee === null).toBe(plan.overagePerEmail === null);
-      }
-    }
+  it("recommends the cheapest plan that fits", () => {
+    expect(recommendPlan(tab("helpdesk-native"), { emails: 1_500, agents: 3 })?.id).toBe("hd-starter");
+    expect(recommendPlan(tab("helpdesk-native"), { emails: 8_000, agents: 3 })?.id).toBe("hd-growth");
+    expect(recommendPlan(tab("helpdesk-middleware"), { emails: 30_000, agents: 1 })?.id).toBe("mw-byok");
+    expect(recommendPlan(tab("send"), { emails: 2_000, agents: 1 })?.id).toBe("send-free");
+    expect(recommendPlan(tab("send"), { emails: 60_000, agents: 1 })?.id).toBe("send-starter");
   });
 });

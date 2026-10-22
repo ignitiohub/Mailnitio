@@ -13,10 +13,10 @@ export default function TicketsPage() {
       description="Customer emails turned into tickets and routed to your teams."
       icon={Inbox}
       emptyTitle="No tickets yet"
-      emptyDescription="Connect a support mailbox and Mailnitio will create tickets from new customer emails."
+      emptyDescription="Tickets appear here once a support mailbox is connected. Mailnitio staff connect mailboxes during setup."
       action={
         <Button asChild>
-          <Link href="/app/mailboxes">Connect a mailbox</Link>
+          <Link href="/demo?offer=setup">Request setup</Link>
         </Button>
       }
     />

@@ -1,6 +1,6 @@
 /**
- * App shell sidebar. Groups follow the approved Stitch dashboard. `product` decides visibility from the
- * workspace's "What brings you here?" answer; `icon` is a lucide-react icon name.
+ * App shell sidebar, per docs/prompts/mailnitio-dev-prompts.md §5 (Portal screens). `product` decides
+ * visibility from the workspace's "What brings you here?" answer; `icon` is a lucide-react icon name.
  */
 
 export type ProductInterest = "helpdesk" | "send" | "both";
@@ -26,34 +26,34 @@ export const appNav: AppNavGroup[] = [
     label: "Helpdesk",
     items: [
       { label: "Tickets", href: "/app/tickets", icon: "Inbox", product: "helpdesk" },
-      { label: "Needs review", href: "/app/review", icon: "ListChecks", product: "helpdesk" },
       { label: "Inbox log", href: "/app/inbox-log", icon: "ScrollText", product: "helpdesk" },
+      { label: "Needs review", href: "/app/review", icon: "ListChecks", product: "helpdesk" },
+      { label: "Customers", href: "/app/customers", icon: "Contact", product: "helpdesk" },
     ],
+  },
+  {
+    label: "Insights",
+    items: [{ label: "Insight report", href: "/app/insights", icon: "ChartColumn", product: "helpdesk" }],
   },
   {
     label: "Send",
     items: [
       { label: "Campaigns", href: "/app/campaigns", icon: "Send", product: "send" },
-      { label: "Audiences", href: "/app/audiences", icon: "Users", product: "send" },
-      { label: "Templates", href: "/app/templates", icon: "LayoutTemplate", product: "send" },
+      { label: "Audiences and templates", href: "/app/audiences", icon: "Users", product: "send" },
     ],
-  },
-  {
-    label: "Knowledge",
-    items: [{ label: "Training", href: "/app/training", icon: "GraduationCap", product: "helpdesk" }],
   },
   {
     label: "Setup",
     items: [
-      { label: "Mailboxes", href: "/app/mailboxes", icon: "Mail", product: "helpdesk" },
-      { label: "Domains", href: "/app/domains", icon: "Globe", product: "send" },
+      { label: "Mailboxes and connections", href: "/app/mailboxes", icon: "Mail", product: "helpdesk" },
+      { label: "Teams, rules and categories", href: "/app/teams", icon: "Workflow", product: "helpdesk" },
     ],
   },
   {
     label: "Admin",
     items: [
-      { label: "Members", href: "/app/settings/members", icon: "UserCog" },
-      { label: "Audit log", href: "/app/settings/audit-log", icon: "ShieldCheck" },
+      { label: "Users and audit", href: "/app/settings/members", icon: "UserCog" },
+      { label: "Usage", href: "/app/usage", icon: "Gauge" },
       { label: "Settings", href: "/app/settings", icon: "Settings" },
     ],
   },

@@ -1,17 +1,24 @@
+import { Button } from "@mailnitio/ui";
 import { Mail } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ModuleEmpty } from "@/components/app/module-empty";
 
-export const metadata: Metadata = { title: "Mailboxes" };
+export const metadata: Metadata = { title: "Mailboxes and connections" };
 
-export default function MailboxesPage() {
+export default function MailboxesandconnectionsPage() {
   return (
     <ModuleEmpty
-      title="Mailboxes"
-      description="The support addresses Mailnitio reads, such as support@ or complaints@."
+      title="Mailboxes and connections"
+      description="The support addresses Mailnitio reads, and their connection status."
       icon={Mail}
       emptyTitle="No mailboxes connected"
-      emptyDescription="Microsoft 365 mailbox connections arrive in the next release. We will email you when they are ready."
+      emptyDescription="During setup, Mailnitio staff connect your Microsoft 365 mailbox in shadow mode first. Self-serve connection arrives later."
+      action={
+        <Button asChild>
+          <Link href="/demo?offer=setup">Request setup</Link>
+        </Button>
+      }
     />
   );
 }

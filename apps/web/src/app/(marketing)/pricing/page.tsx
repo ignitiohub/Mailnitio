@@ -9,7 +9,7 @@ import { PricingExplorer } from "./pricing-explorer";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Simple pricing for Mailnitio Helpdesk (native and middleware) and Send, in naira and US dollars. No per-seat charges on Growth and above.",
+    "Pricing for Mailnitio Helpdesk (per agent, or per email in middleware mode) and Send. Start with a free 30-day pilot.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -27,8 +27,8 @@ export default async function PricingPage({ searchParams }: { searchParams: Prom
             id="pricing-heading"
             as="h1"
             overline="Pricing"
-            title="Pay for the emails we handle, not for seats"
-            description="Every plan is priced in naira and US dollars. Start with a free proof of concept in shadow mode."
+            title="Simple pricing that follows how your team works"
+            description="Per agent when your team works in Mailnitio, per email when it works in your CRM. Start with a free pilot in shadow mode."
           />
           <Banner
             tone="info"
