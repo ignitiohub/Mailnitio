@@ -1,0 +1,22 @@
+{
+  "name": "@mailnitio/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@mailnitio/db": "workspace:*",
+    "@mailnitio/shared": "workspace:*",
+    "@mailnitio/crypto": "workspace:*",
+    "@mailnitio/observability": "workspace:*",
+    "drizzle-orm": "latest",
+    "resend": "latest"
+  },
+  "devDependencies": {}
+}
