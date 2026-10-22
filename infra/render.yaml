@@ -1,0 +1,104 @@
+# Render Blueprint for Mailnitio staging (Frankfurt, starter plans).
+# Secrets are declared with `sync: false` and entered in the Render dashboard; they are never committed.
+# Apply with: Render dashboard > Blueprints > New Blueprint Instance > path infra/render.yaml
+
+envVarGroups:
+  - name: mailnitio-staging-shared
+    envVars:
+      - key: APP_ENV
+        value: staging
+      - key: NODE_VERSION
+        value: "22"
+      - key: LOG_LEVEL
+        value: info
+      # Neon staging branch, connection as mailnitio_app (RLS enforced, non-owner).
+      - key: DATABASE_URL
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: SYSTEM_EMAIL_FROM
+        value: "Mailnitio <no-reply@mailnitio.com>"
+      - key: LEADS_NOTIFY_EMAIL
+        sync: false
+
+services:
+  - type: web
+    name: mailnitio-api-staging
+    runtime: node
+    region: frankfurt
+    plan: starter
+    branch: main
+    autoDeploy: true
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm turbo run build --filter=@mailnitio/api
+    # Migrations run as the Neon owner role before each deploy.
+    preDeployCommand: pnpm --filter @mailnitio/db migrate
+    startCommand: node apps/api/dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: mailnitio-staging-shared
+      - key: DATABASE_URL_AUTH
+        sync: false
+      - key: DATABASE_URL_OWNER
+        sync: false
+      - key: APP_DB_PASSWORD
+        sync: false
+      - key: AUTH_DB_PASSWORD
+        sync: false
+      - key: MAILNITIO_KEK
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: API_PUBLIC_URL
+        sync: false
+      - key: WEB_ORIGIN
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+
+  - type: web
+    name: mailnitio-web-staging
+    runtime: node
+    region: frankfurt
+    plan: starter
+    branch: main
+    autoDeploy: true
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm turbo run build --filter=@mailnitio/web
+    startCommand: pnpm --filter @mailnitio/web start
+    healthCheckPath: /health
+    envVars:
+      - fromGroup: mailnitio-staging-shared
+      - key: API_HOSTPORT
+        fromService:
+          type: web
+          name: mailnitio-api-staging
+          property: hostport
+      - key: NEXT_PUBLIC_APP_ENV
+        value: staging
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: NEXT_PUBLIC_TURNSTILE_SITE_KEY
+        sync: false
+      - key: NEXT_PUBLIC_SENTRY_DSN
+        sync: false
+      - key: SENTRY_AUTH_TOKEN
+        sync: false
+      - key: SENTRY_ORG
+        sync: false
+      - key: SENTRY_PROJECT_WEB
+        sync: false
+
+  - type: worker
+    name: mailnitio-worker-staging
+    runtime: node
+    region: frankfurt
+    plan: starter
+    branch: main
+    autoDeploy: true
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm turbo run build --filter=@mailnitio/worker
+    startCommand: node apps/worker/dist/index.js
+    envVars:
+      - fromGroup: mailnitio-staging-shared
+      - key: SLACK_WEBHOOK_URL
+        sync: false

@@ -8,6 +8,7 @@ design QA checklist. The Stitch prompt and reference mockups are in
 [docs/design/stitch-brief.md](docs/design/stitch-brief.md).
 
 ## Products
+
 - **Mailnitio Helpdesk** (product 1): AI email customer service. Two modes sharing one AI agent engine:
   - Native mode (BUILD NOW): tickets live on Mailnitio; agents work in the Mailnitio UI; replies are sent
     from the customer's own mailbox via Microsoft Graph.
@@ -16,6 +17,7 @@ design QA checklist. The Stitch prompt and reference mockups are in
 - **Mailnitio Send** (product 2): templates, audiences, campaigns on Amazon SES. BUILD NOW: "Send lite" only.
 
 ## Stack (do not change without asking)
+
 - TypeScript, Node 22, pnpm workspaces + Turborepo
 - apps/web: Next.js App Router, Tailwind, shadcn/ui (marketing + portal + admin route groups)
 - apps/api: Fastify + zod (fastify-type-provider-zod)
@@ -30,6 +32,7 @@ design QA checklist. The Stitch prompt and reference mockups are in
 - Observability: pino logs, Sentry; system email via SES (Resend acceptable for D1)
 
 ## Architecture rules
+
 1. Multi-tenant: every tenant table has workspace_id NOT NULL; Postgres RLS enabled + FORCED; app connects
    as a non-owner role; all DB access goes through withTenant(workspaceId, fn) which sets
    app.workspace_id via set_config(..., true) inside a transaction.
@@ -48,6 +51,7 @@ design QA checklist. The Stitch prompt and reference mockups are in
 10. Write tests for: RLS isolation, idempotency, router decision table, thread resolver, PII masking.
 
 ## Conventions
+
 - Folder layout: see mailnitio-platform-plan.md §5. Ticket keys: MN-<number> per workspace.
 - API: /v1/... JSON, zod schemas, cursor pagination, errors { error: { code, message } }.
 - Roles: owner, admin, supervisor, agent, reviewer, viewer (+ developer, marketer for Send).
@@ -55,11 +59,13 @@ design QA checklist. The Stitch prompt and reference mockups are in
 - Small, reviewable commits; update docs/specs when behaviour changes.
 
 ## Reference docs
+
 mailnitio-platform-plan.md, mailnitio-middleware-spec.md (sections cited in each prompt).
 When something is ambiguous, choose the simplest option consistent with these rules and note it in
 docs/decisions.md.
 
 ## Repo / git
+
 - `origin` is `git@github-ignitiohub:ignitiohub/Mailnitio.git` (SSH alias for the ignitiohub account in
   ~/.ssh/config). Do not switch it back to HTTPS; the Windows credential manager holds a different account.
 - Commit identity for this repo: ignitiohub <ignitiohub@gmail.com>.
