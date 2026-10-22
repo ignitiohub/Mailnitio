@@ -1,0 +1,30 @@
+{
+  "name": "@mailnitio/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@mailnitio/core": "workspace:*",
+    "@mailnitio/db": "workspace:*",
+    "@mailnitio/observability": "workspace:*",
+    "@mailnitio/shared": "workspace:*",
+    "@sentry/node": "latest",
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.23.1",
+    "pg-boss": "latest",
+    "pino": "^10.4.0",
+    "pino-pretty": "^13.2.0",
+    "resend": "^6.34.1",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "tsup": "latest"
+  }
+}
