@@ -1,0 +1,19 @@
+{
+  "name": "@mailnitio/observability",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "pino": "latest",
+    "pino-pretty": "latest",
+    "@sentry/node": "latest"
+  },
+  "devDependencies": {}
+}
