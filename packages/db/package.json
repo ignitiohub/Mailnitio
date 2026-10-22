@@ -1,0 +1,27 @@
+{
+  "name": "@mailnitio/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "generate": "drizzle-kit generate",
+    "migrate": "tsx --env-file-if-exists=../../.env src/scripts/migrate.ts",
+    "local": "tsx src/scripts/local-postgres.ts"
+  },
+  "dependencies": {
+    "@mailnitio/shared": "workspace:*",
+    "drizzle-orm": "latest",
+    "pg": "latest"
+  },
+  "devDependencies": {
+    "@types/pg": "latest",
+    "drizzle-kit": "latest",
+    "embedded-postgres": "18.4.0-beta.17"
+  }
+}
