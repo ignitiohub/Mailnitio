@@ -1,0 +1,4 @@
+@import "@mailnitio/ui/styles.css";
+
+/* Tailwind scans the shared UI package as well as this app. */
+@source "../../../../packages/ui/src";
