@@ -1,0 +1,263 @@
+/*
+ * Mailnitio design tokens. Single source of truth for colour, type, spacing, radius, elevation and motion.
+ * Components use Tailwind utilities mapped to these variables; never hard-code hex values in components.
+ */
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f1f3f7;
+  --border: #e3e6ec;
+  --border-strong: #cdd2db;
+  --text: #0e1525;
+  --text-muted: #4a5568;
+  --text-subtle: #6b7385;
+  --primary: #3b3fc4;
+  --primary-hover: #3236a8;
+  --primary-soft: #eef0ff;
+  --primary-fg: #ffffff;
+  --success: #0f8a5f;
+  --success-soft: #e7f6ef;
+  --warning: #b7791f;
+  --warning-soft: #fdf5e6;
+  --danger: #c53030;
+  --danger-soft: #fdecec;
+  --info: #2563eb;
+  --info-soft: #eaf1fe;
+  --neutral: #64748b;
+  --neutral-soft: #f1f5f9;
+  --overlay: rgb(14 21 37 / 0.45);
+
+  /* Chart palette (ordered, colour-blind-aware). Max 6 series per chart. */
+  --chart-1: #3b3fc4;
+  --chart-2: #0f8a5f;
+  --chart-3: #b7791f;
+  --chart-4: #2563eb;
+  --chart-5: #7c3aed;
+  --chart-6: #0e7490;
+  --chart-7: #c53030;
+  --chart-8: #64748b;
+
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06);
+  --shadow-md: 0 4px 12px rgb(16 24 40 / 0.08);
+  --shadow-lg: 0 12px 32px rgb(16 24 40 / 0.12);
+
+  --row-height: 44px;
+}
+
+[data-density="compact"] {
+  --row-height: 36px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b0f19;
+  --surface: #121826;
+  --surface-2: #1a2132;
+  --border: #252d3f;
+  --border-strong: #343d52;
+  --text: #e8ecf4;
+  --text-muted: #a7b0c2;
+  --text-subtle: #7f899d;
+  --primary: #7b7ff0;
+  --primary-hover: #8d91f5;
+  --primary-soft: #1e2142;
+  --primary-fg: #0b0f19;
+  /* Status colours lightened for AA contrast on dark surfaces. */
+  --success: #34c38f;
+  --success-soft: #0f2a21;
+  --warning: #e0a84a;
+  --warning-soft: #2e2412;
+  --danger: #f07171;
+  --danger-soft: #3a1717;
+  --info: #6b9cf7;
+  --info-soft: #14223f;
+  --neutral: #94a3b8;
+  --neutral-soft: #1c2433;
+  --overlay: rgb(0 0 0 / 0.6);
+
+  --chart-1: #7b7ff0;
+  --chart-2: #34c38f;
+  --chart-3: #e0a84a;
+  --chart-4: #6b9cf7;
+  --chart-5: #a78bfa;
+  --chart-6: #22b8cf;
+  --chart-7: #f07171;
+  --chart-8: #94a3b8;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-fg: var(--primary-fg);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-neutral: var(--neutral);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-overlay: var(--overlay);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+
+@theme {
+  /* Radius: 6px controls, 8px cards, 12px modals and drawers. */
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+
+  /* Type scale: size / line-height / weight / tracking. */
+  --text-display: 48px;
+  --text-display--line-height: 56px;
+  --text-display--font-weight: 600;
+  --text-display--letter-spacing: -0.02em;
+  --text-h1: 30px;
+  --text-h1--line-height: 38px;
+  --text-h1--font-weight: 600;
+  --text-h1--letter-spacing: -0.02em;
+  --text-h2: 24px;
+  --text-h2--line-height: 32px;
+  --text-h2--font-weight: 600;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h3: 20px;
+  --text-h3--line-height: 28px;
+  --text-h3--font-weight: 600;
+  --text-h4: 16px;
+  --text-h4--line-height: 24px;
+  --text-h4--font-weight: 600;
+  --text-body: 14px;
+  --text-body--line-height: 20px;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 24px;
+  --text-small: 13px;
+  --text-small--line-height: 18px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 500;
+  --text-overline: 11px;
+  --text-overline--line-height: 16px;
+  --text-overline--font-weight: 600;
+  --text-overline--letter-spacing: 0.06em;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+
+  --animate-fade-in: fade-in var(--duration-base) var(--ease-out);
+  --animate-slide-in-right: slide-in-right var(--duration-slow) var(--ease-out);
+  --animate-slide-up: slide-up var(--duration-slow) var(--ease-out);
+  --animate-row-highlight: row-highlight 1.5s var(--ease-out);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(16px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @keyframes slide-up {
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes row-highlight {
+    from {
+      background-color: var(--primary-soft);
+    }
+    to {
+      background-color: transparent;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv11";
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--primary-soft);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility prose-width {
+  max-width: 72ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
