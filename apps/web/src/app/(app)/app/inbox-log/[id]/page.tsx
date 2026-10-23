@@ -57,7 +57,13 @@ interface EmailDetail {
   needsReview: boolean;
   reviewReasons: string[];
   ackSent: boolean;
-  timeline: { step: string; label: string; at: string; detail?: string; state: "done" | "failed" | "skipped" }[];
+  timeline: {
+    step: string;
+    label: string;
+    at: string;
+    detail?: string;
+    state: "done" | "failed" | "skipped";
+  }[];
   configVersion: number | null;
   lastError: string | null;
   mailbox: string | null;
@@ -75,13 +81,36 @@ interface EmailDetail {
     costUsd: number | null;
     createdAt: string;
   }[];
-  ticket: { id: string; key: string; subject: string; status: string; priority: string; teamName: string | null } | null;
+  ticket: {
+    id: string;
+    key: string;
+    subject: string;
+    status: string;
+    priority: string;
+    teamName: string | null;
+  } | null;
   relatedTicket: { id: string; key: string } | null;
   thread: { id: string; rollingSummary: string | null; messageCount: number } | null;
-  messages: { id: string; direction: string; fromAddr: string | null; fromName: string | null; bodyText: string; emailLogId: string | null; createdAt: string }[];
+  messages: {
+    id: string;
+    direction: string;
+    fromAddr: string | null;
+    fromName: string | null;
+    bodyText: string;
+    emailLogId: string | null;
+    createdAt: string;
+  }[];
   customer: { id: string; name: string | null; email: string } | null;
   review: { id: string; status: string; reasons: string[] } | null;
-  overrides: { id: string; field: string; oldValue: string | null; newValue: string | null; note: string | null; createdAt: string; userName: string | null }[];
+  overrides: {
+    id: string;
+    field: string;
+    oldValue: string | null;
+    newValue: string | null;
+    note: string | null;
+    createdAt: string;
+    userName: string | null;
+  }[];
 }
 
 const MATCH_LABELS: Record<string, string> = {
@@ -110,7 +139,7 @@ const OVERRIDE_FIELDS: Record<string, string> = {
 
 function EmailSkeleton() {
   return (
-    <div className="flex flex-col gap-6" aria-busy="true" aria-label="Loading email">
+    <div className="flex flex-col gap-6" role="status" aria-busy="true" aria-label="Loading email">
       <Skeleton className="h-9 w-2/3" />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Skeleton className="h-96 w-full rounded-card" />
@@ -131,7 +160,10 @@ export default function EmailDetailPage() {
   if (email.loading && !e) return <EmailSkeleton />;
   if (email.error || !e) {
     return email.error?.status === 404 ? (
-      <ErrorState title="Email not found" description="It may belong to another workspace. Go back to the inbox log and search for it." />
+      <ErrorState
+        title="Email not found"
+        description="It may belong to another workspace. Go back to the inbox log and search for it."
+      />
     ) : (
       <ErrorState referenceId={email.error?.referenceId} onRetry={email.refetch} />
     );
@@ -155,13 +187,18 @@ export default function EmailDetailPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <Link href="/app/inbox-log" className="inline-flex w-fit items-center gap-1.5 text-small text-text-muted hover:text-text">
+        <Link
+          href="/app/inbox-log"
+          className="inline-flex w-fit items-center gap-1.5 text-small text-text-muted hover:text-text"
+        >
           <ArrowLeft aria-hidden className="size-4" />
           Inbox log
         </Link>
         <div className="flex flex-wrap items-center gap-2">
           <EmailChip chip={e.chip} />
-          {e.action ? <span className="text-small text-text-muted">{ACTION_LABELS[e.action] ?? e.action}</span> : null}
+          {e.action ? (
+            <span className="text-small text-text-muted">{ACTION_LABELS[e.action] ?? e.action}</span>
+          ) : null}
           {e.ticket ? (
             <Link href={`/app/tickets/${e.ticket.id}`} className="hover:underline">
               <TicketKey value={e.ticket.key} />
@@ -170,8 +207,8 @@ export default function EmailDetailPage() {
         </div>
         <h1 className="text-h3 break-words text-text md:text-h2">{e.subject}</h1>
         <p className="text-body text-text-muted">
-          From <span className="text-text">{e.senderName ? `${e.senderName} <${e.sender}>` : e.sender}</span> to{" "}
-          {e.mailbox ?? e.toAddrs.join(", ")} ·{" "}
+          From <span className="text-text">{e.senderName ? `${e.senderName} <${e.sender}>` : e.sender}</span>{" "}
+          to {e.mailbox ?? e.toAddrs.join(", ")} ·{" "}
           <time dateTime={e.receivedAt} className="tabular">
             {formatDateTime(e.receivedAt, tz)}
           </time>
@@ -180,7 +217,8 @@ export default function EmailDetailPage() {
 
       {e.status === "failed" ? (
         <Banner tone="danger" title="Processing failed">
-          {e.lastError ?? "Mailnitio could not finish processing this email."} The email is kept and will be retried; nothing was lost.
+          {e.lastError ?? "Mailnitio could not finish processing this email."} The email is kept and will be
+          retried; nothing was lost.
         </Banner>
       ) : null}
       {e.status === "skipped" ? (
@@ -190,7 +228,8 @@ export default function EmailDetailPage() {
       ) : null}
       {e.status === "shadow" ? (
         <Banner tone="warning" title="Shadow mode">
-          {e.mailbox ?? "This mailbox"} is in shadow mode: the decision is recorded but no ticket action or acknowledgement was taken.
+          {e.mailbox ?? "This mailbox"} is in shadow mode: the decision is recorded but no ticket action or
+          acknowledgement was taken.
         </Banner>
       ) : null}
       {e.escalated ? (
@@ -227,7 +266,9 @@ export default function EmailDetailPage() {
             {steps.length > 0 ? (
               <Timeline steps={steps} />
             ) : (
-              <p className="text-body text-text-muted">Processing has not started yet. This page updates automatically.</p>
+              <p className="text-body text-text-muted">
+                Processing has not started yet. This page updates automatically.
+              </p>
             )}
           </Card>
 
@@ -242,7 +283,9 @@ export default function EmailDetailPage() {
             <Card className="flex flex-col gap-3 p-4 md:p-6">
               <div className="flex items-baseline justify-between gap-3">
                 <h2 className="text-h3 text-text">Conversation</h2>
-                <span className="text-small text-text-muted tabular">{formatNumber(e.thread.messageCount)} messages</span>
+                <span className="text-small text-text-muted tabular">
+                  {formatNumber(e.thread.messageCount)} messages
+                </span>
               </div>
               {e.thread.rollingSummary ? (
                 <p className="prose-width text-body text-text-muted">
@@ -256,9 +299,14 @@ export default function EmailDetailPage() {
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <span className="text-body font-medium text-text">
                         {m.direction === "note" ? "Internal note" : (m.fromName ?? m.fromAddr ?? "Unknown")}
-                        {m.emailLogId === e.id ? <span className="ml-2 text-caption text-primary">This email</span> : null}
+                        {m.emailLogId === e.id ? (
+                          <span className="ml-2 text-caption text-primary">This email</span>
+                        ) : null}
                       </span>
-                      <time dateTime={m.createdAt} className="text-caption font-normal text-text-subtle tabular">
+                      <time
+                        dateTime={m.createdAt}
+                        className="text-caption font-normal text-text-subtle tabular"
+                      >
                         {formatDateTime(m.createdAt, tz)}
                       </time>
                     </div>
@@ -278,11 +326,19 @@ export default function EmailDetailPage() {
                     <span className="text-text">
                       {OVERRIDE_FIELDS[o.field] ?? o.field}:{" "}
                       <span className="text-text-muted line-through">
-                        {o.field === "category" ? categoryLabel(o.oldValue) : o.field === "team" ? teamName(o.oldValue) : (o.oldValue ?? "None")}
+                        {o.field === "category"
+                          ? categoryLabel(o.oldValue)
+                          : o.field === "team"
+                            ? teamName(o.oldValue)
+                            : (o.oldValue ?? "None")}
                       </span>{" "}
                       →{" "}
                       <span className="font-medium">
-                        {o.field === "category" ? categoryLabel(o.newValue) : o.field === "team" ? teamName(o.newValue) : (o.newValue ?? "None")}
+                        {o.field === "category"
+                          ? categoryLabel(o.newValue)
+                          : o.field === "team"
+                            ? teamName(o.newValue)
+                            : (o.newValue ?? "None")}
                       </span>
                     </span>
                     <span className="text-small text-text-subtle">
@@ -319,7 +375,9 @@ export default function EmailDetailPage() {
                 </>
               ) : null}
               <dt className="text-text-muted">Thread match</dt>
-              <dd className="text-right text-text">{e.matchMethod ? (MATCH_LABELS[e.matchMethod] ?? e.matchMethod) : "None"}</dd>
+              <dd className="text-right text-text">
+                {e.matchMethod ? (MATCH_LABELS[e.matchMethod] ?? e.matchMethod) : "None"}
+              </dd>
               <dt className="text-text-muted">Customer</dt>
               <dd className="text-right text-text">
                 {e.customer ? (
@@ -334,7 +392,9 @@ export default function EmailDetailPage() {
               <dd className="text-right text-text">{e.ackSent ? "Recorded" : "Not sent"}</dd>
               <dt className="text-text-muted">Thresholds</dt>
               <dd className="text-right text-text tabular">
-                {config ? `${Math.round(config.thresholds.high * 100)}% / ${Math.round(config.thresholds.low * 100)}%` : "None"}
+                {config
+                  ? `${Math.round(config.thresholds.high * 100)}% / ${Math.round(config.thresholds.low * 100)}%`
+                  : "None"}
               </dd>
               <dt className="text-text-muted">Config version</dt>
               <dd className="text-right text-text tabular">{e.configVersion ?? "None"}</dd>
@@ -344,7 +404,10 @@ export default function EmailDetailPage() {
           {e.ticket ? (
             <Card className="flex flex-col gap-2 p-4">
               <h2 className="text-h4 text-text">Ticket</h2>
-              <Link href={`/app/tickets/${e.ticket.id}`} className="flex items-center gap-2 rounded-control p-1 hover:bg-surface-2">
+              <Link
+                href={`/app/tickets/${e.ticket.id}`}
+                className="flex items-center gap-2 rounded-control p-1 hover:bg-surface-2"
+              >
                 <TicketKey value={e.ticket.key} />
                 <span className="min-w-0 flex-1 truncate text-small text-text">{e.ticket.subject}</span>
                 <TicketStatusChip status={e.ticket.status} />
@@ -352,7 +415,10 @@ export default function EmailDetailPage() {
               {e.relatedTicket ? (
                 <p className="text-small text-text-muted">
                   Linked to{" "}
-                  <Link href={`/app/tickets/${e.relatedTicket.id}`} className="font-mono text-primary hover:underline">
+                  <Link
+                    href={`/app/tickets/${e.relatedTicket.id}`}
+                    className="font-mono text-primary hover:underline"
+                  >
                     {e.relatedTicket.key}
                   </Link>
                 </p>
@@ -382,10 +448,16 @@ export default function EmailDetailPage() {
                   {e.agentRuns.map((r) => (
                     <tr key={r.id} className="border-t border-border">
                       <td className="py-2">
-                        <span className={r.ok ? "text-text" : "text-danger"}>{AGENT_LABELS[r.agentType] ?? r.agentType}</span>
-                        {!r.ok ? <span className="block text-caption text-danger">{r.error ?? "Failed"}</span> : null}
+                        <span className={r.ok ? "text-text" : "text-danger"}>
+                          {AGENT_LABELS[r.agentType] ?? r.agentType}
+                        </span>
+                        {!r.ok ? (
+                          <span className="block text-caption text-danger">{r.error ?? "Failed"}</span>
+                        ) : null}
                       </td>
-                      <td className="py-2 text-right text-text tabular">{formatNumber((r.inputTokens ?? 0) + (r.outputTokens ?? 0))}</td>
+                      <td className="py-2 text-right text-text tabular">
+                        {formatNumber((r.inputTokens ?? 0) + (r.outputTokens ?? 0))}
+                      </td>
                       <td className="py-2 text-right text-text tabular">{formatUsd(r.costUsd ?? 0)}</td>
                     </tr>
                   ))}

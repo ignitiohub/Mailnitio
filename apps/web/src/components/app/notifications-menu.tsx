@@ -1,6 +1,14 @@
 "use client";
 
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, Tooltip } from "@mailnitio/ui";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+  Tooltip,
+} from "@mailnitio/ui";
 import { AtSign, Bell, MessageSquareReply, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { When } from "@/components/helpdesk/display";
@@ -26,11 +34,16 @@ function text(n: Notification) {
 
 export function NotificationsMenu() {
   const router = useRouter();
-  const { data, refetch } = useApi<{ data: Notification[]; unread: number }>("/v1/notifications", { pollMs: 30_000 });
+  const { data, refetch } = useApi<{ data: Notification[]; unread: number }>("/v1/notifications", {
+    pollMs: 30_000,
+  });
   const unread = data?.unread ?? 0;
 
   async function open(n: Notification) {
-    if (!n.readAt) await apiFetch("/v1/notifications/read", { method: "POST", json: { ids: [n.id] } }).catch(() => undefined);
+    if (!n.readAt)
+      await apiFetch("/v1/notifications/read", { method: "POST", json: { ids: [n.id] } }).catch(
+        () => undefined,
+      );
     refetch();
     router.push(`/app/tickets/${n.data.ticketId}`);
   }
@@ -52,7 +65,10 @@ export function NotificationsMenu() {
           >
             <Bell aria-hidden />
             {unread > 0 ? (
-              <span aria-hidden className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] leading-none font-semibold text-surface tabular">
+              <span
+                aria-hidden
+                className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] leading-none font-semibold text-surface tabular"
+              >
                 {unread > 9 ? "9+" : unread}
               </span>
             ) : null}
@@ -63,26 +79,42 @@ export function NotificationsMenu() {
         <div className="flex items-center justify-between px-2 py-1">
           <DropdownMenuLabel className="px-0">Notifications</DropdownMenuLabel>
           {unread > 0 ? (
-            <button type="button" className="cursor-pointer text-small text-primary hover:underline" onClick={() => void markAll()}>
+            <button
+              type="button"
+              className="cursor-pointer text-small text-primary hover:underline"
+              onClick={() => void markAll()}
+            >
               Mark all as read
             </button>
           ) : null}
         </div>
         {(data?.data ?? []).length === 0 ? (
-          <p className="px-2 pb-3 text-body text-text-muted">No notifications. Assignments, customer replies and mentions appear here.</p>
+          <p className="px-2 pb-3 text-body text-text-muted">
+            No notifications. Assignments, customer replies and mentions appear here.
+          </p>
         ) : (
           <div className="max-h-96 overflow-y-auto">
             {data?.data.map((n) => {
               const Icon = ICONS[n.type];
               return (
-                <DropdownMenuItem key={n.id} onSelect={() => void open(n)} className="h-auto items-start py-2">
+                <DropdownMenuItem
+                  key={n.id}
+                  onSelect={() => void open(n)}
+                  className="h-auto items-start py-2"
+                >
                   <Icon aria-hidden className="mt-0.5" />
                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <span className={n.readAt ? "text-text-muted" : "font-medium text-text"}>{text(n)}</span>
-                    <span className="truncate text-small text-text-subtle">{n.data.excerpt ?? n.data.subject}</span>
+                    <span className="truncate text-small text-text-subtle">
+                      {n.data.excerpt ?? n.data.subject}
+                    </span>
                     <When at={n.createdAt} className="text-caption font-normal text-text-subtle" />
                   </span>
-                  {!n.readAt ? <span aria-label="Unread" className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" /> : null}
+                  {!n.readAt ? (
+                    <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary">
+                      <span className="sr-only">Unread</span>
+                    </span>
+                  ) : null}
                 </DropdownMenuItem>
               );
             })}

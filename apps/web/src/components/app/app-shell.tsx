@@ -90,7 +90,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { helpOpen, setHelpOpen } = useGlobalShortcuts(openSearch);
   const helpdesk = me.workspace.productInterest !== "send";
   // Badge counts for the sidebar (polled; cheap aggregate).
-  const counts = useApi<{ data: Record<string, number> }>(helpdesk ? "/v1/tickets/counts" : null, { pollMs: 30_000 });
+  const counts = useApi<{ data: Record<string, number> }>(helpdesk ? "/v1/tickets/counts" : null, {
+    pollMs: 30_000,
+  });
   const reviewCount = counts.data?.data.needs_review;
 
   const groups: ShellNavGroup[] = navForInterest(me.workspace.productInterest, me.role).map((group) => ({
@@ -142,7 +144,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           <>
             <SearchButton onClick={openSearch} />
             <Tooltip content="Search" shortcut="/">
-              <Button variant="ghost" size="icon" aria-label="Search" className="max-md:size-11 lg:hidden" onClick={openSearch}>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Search"
+                className="max-md:size-11 lg:hidden"
+                onClick={openSearch}
+              >
                 <Search aria-hidden />
               </Button>
             </Tooltip>
@@ -150,7 +158,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ThemeSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-2 px-1.5 max-md:size-11" aria-label={`Account menu for ${me.user.name}`}>
+                <Button
+                  variant="ghost"
+                  className="gap-2 px-1.5 max-md:size-11"
+                  aria-label={`Account menu for ${me.user.name}`}
+                >
                   <span className="flex size-7 items-center justify-center rounded-full bg-primary-soft text-caption text-primary">
                     {initials(me.user.name)}
                   </span>

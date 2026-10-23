@@ -1,6 +1,6 @@
 "use client";
 
-import { Table2, BarChart3 } from "lucide-react";
+import { BarChart3, Table2 } from "lucide-react";
 import { useId, useState } from "react";
 import { cn } from "../lib/cn";
 import { formatNumber } from "../lib/format";
@@ -12,7 +12,13 @@ import { Button } from "./button";
  * for 2+ series, a hover/focus tooltip on every mark, and a table view. Text uses text tokens only.
  */
 
-const SERIES_VARS = ["var(--series-1)", "var(--series-2)", "var(--series-3)", "var(--series-4)", "var(--series-5)"];
+const SERIES_VARS = [
+  "var(--series-1)",
+  "var(--series-2)",
+  "var(--series-3)",
+  "var(--series-4)",
+  "var(--series-5)",
+];
 
 export function seriesColor(index: number, key?: string): string {
   if (key === "other") return "var(--series-other)";
@@ -54,7 +60,11 @@ export function StackedBarChart({ label, series, points, height = 220, className
         <ul className="flex flex-wrap gap-x-4 gap-y-1" aria-label="Legend">
           {series.map((s, i) => (
             <li key={s.key} className="flex items-center gap-1.5 text-caption font-normal text-text-muted">
-              <span aria-hidden className="size-2.5 rounded-[3px]" style={{ background: seriesColor(i, s.key) }} />
+              <span
+                aria-hidden
+                className="size-2.5 rounded-[3px]"
+                style={{ background: seriesColor(i, s.key) }}
+              />
               {s.label}
             </li>
           ))}
@@ -100,7 +110,9 @@ export function StackedBarChart({ label, series, points, height = 220, className
                       {formatNumber(p.values[s.key] ?? 0)}
                     </td>
                   ))}
-                  <td className="py-1.5 pl-2 text-right font-medium text-text tabular">{formatNumber(totals[i] ?? 0)}</td>
+                  <td className="py-1.5 pl-2 text-right font-medium text-text tabular">
+                    {formatNumber(totals[i] ?? 0)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -120,7 +132,11 @@ export function StackedBarChart({ label, series, points, height = 220, className
               ))}
           </div>
           <div className="relative flex-1">
-            <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col justify-between" style={{ height: height - 24 }} aria-hidden>
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 flex flex-col justify-between"
+              style={{ height: height - 24 }}
+              aria-hidden
+            >
               {ticks.map((t) => (
                 <span key={t} className="h-px w-full bg-border" />
               ))}
@@ -148,11 +164,17 @@ export function StackedBarChart({ label, series, points, height = 220, className
                         {series.map((s, si) => {
                           const v = p.values[s.key] ?? 0;
                           if (v <= 0) return null;
-                          const isTop = series.slice(si + 1).every((later) => (p.values[later.key] ?? 0) <= 0);
+                          const isTop = series
+                            .slice(si + 1)
+                            .every((later) => (p.values[later.key] ?? 0) <= 0);
                           return (
                             <span
                               key={s.key}
-                              className={cn("w-full min-h-[2px] transition-opacity duration-150", isTop && "rounded-t-[4px]", active !== null && active !== i && "opacity-60")}
+                              className={cn(
+                                "w-full min-h-[2px] transition-opacity duration-150",
+                                isTop && "rounded-t-[4px]",
+                                active !== null && active !== i && "opacity-60",
+                              )}
                               style={{ flexGrow: v, flexBasis: 0, background: seriesColor(si, s.key) }}
                             />
                           );
@@ -169,9 +191,16 @@ export function StackedBarChart({ label, series, points, height = 220, className
                       >
                         <span className="mb-1.5 block text-caption text-text">{p.detail ?? p.label}</span>
                         {series.map((s, si) => (
-                          <span key={s.key} className="flex items-center justify-between gap-4 text-small text-text-muted">
+                          <span
+                            key={s.key}
+                            className="flex items-center justify-between gap-4 text-small text-text-muted"
+                          >
                             <span className="flex items-center gap-1.5">
-                              <span aria-hidden className="size-2 rounded-[2px]" style={{ background: seriesColor(si, s.key) }} />
+                              <span
+                                aria-hidden
+                                className="size-2 rounded-[2px]"
+                                style={{ background: seriesColor(si, s.key) }}
+                              />
                               {s.label}
                             </span>
                             <span className="tabular text-text">{formatNumber(p.values[s.key] ?? 0)}</span>
@@ -182,7 +211,9 @@ export function StackedBarChart({ label, series, points, height = 220, className
                         </span>
                       </span>
                     </button>
-                    <span className="mt-2 h-4 text-caption leading-4 font-normal text-text-subtle">{p.label}</span>
+                    <span className="mt-2 h-4 text-caption leading-4 font-normal text-text-subtle">
+                      {p.label}
+                    </span>
                   </div>
                 );
               })}
@@ -219,7 +250,10 @@ export function BarList({
             </span>
           </div>
           <span className="h-2 w-full rounded-full bg-surface-2" aria-hidden>
-            <span className="block h-2 rounded-full bg-[var(--series-1)]" style={{ width: `${(item.value / max) * 100}%` }} />
+            <span
+              className="block h-2 rounded-full bg-[var(--series-1)]"
+              style={{ width: `${(item.value / max) * 100}%` }}
+            />
           </span>
         </li>
       ))}

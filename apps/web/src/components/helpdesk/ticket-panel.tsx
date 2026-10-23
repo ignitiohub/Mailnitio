@@ -6,7 +6,14 @@ import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useMe } from "@/lib/me";
-import { formatUsd, PRIORITY_LABELS, SlaTimer, TICKET_STATUS_LABELS, TicketKey, TicketStatusChip } from "./display";
+import {
+  formatUsd,
+  PRIORITY_LABELS,
+  SlaTimer,
+  TICKET_STATUS_LABELS,
+  TicketKey,
+  TicketStatusChip,
+} from "./display";
 import { useLookups } from "./lookups";
 import type { TicketDetail } from "./ticket-types";
 
@@ -41,9 +48,12 @@ export function TicketPanel({
 
   async function update(patch: Patch, message: string) {
     const before = ticket;
-    const teamName = patch.teamId !== undefined ? (teams.find((t) => t.id === patch.teamId)?.name ?? null) : ticket.teamName;
+    const teamName =
+      patch.teamId !== undefined ? (teams.find((t) => t.id === patch.teamId)?.name ?? null) : ticket.teamName;
     const assigneeName =
-      patch.assigneeId !== undefined ? (members.find((m) => m.userId === patch.assigneeId)?.name ?? null) : ticket.assigneeName;
+      patch.assigneeId !== undefined
+        ? (members.find((m) => m.userId === patch.assigneeId)?.name ?? null)
+        : ticket.assigneeName;
     onChange((t) => ({ ...t, ...patch, teamName, assigneeName }));
     try {
       await apiFetch(`/v1/tickets/${ticket.id}`, { method: "PATCH", json: patch });
@@ -77,7 +87,9 @@ export function TicketPanel({
           <Select
             value={ticket.status}
             disabled={!editable}
-            onChange={(e) => void update({ status: e.target.value }, `Status set to ${TICKET_STATUS_LABELS[e.target.value]}`)}
+            onChange={(e) =>
+              void update({ status: e.target.value }, `Status set to ${TICKET_STATUS_LABELS[e.target.value]}`)
+            }
           >
             {Object.entries(TICKET_STATUS_LABELS).map(([k, v]) => (
               <option key={k} value={k}>
@@ -90,7 +102,9 @@ export function TicketPanel({
           <Select
             value={ticket.priority}
             disabled={!editable}
-            onChange={(e) => void update({ priority: e.target.value }, `Priority set to ${PRIORITY_LABELS[e.target.value]}`)}
+            onChange={(e) =>
+              void update({ priority: e.target.value }, `Priority set to ${PRIORITY_LABELS[e.target.value]}`)
+            }
           >
             {Object.entries(PRIORITY_LABELS).map(([k, v]) => (
               <option key={k} value={k}>
@@ -130,7 +144,12 @@ export function TicketPanel({
           <Select
             value={ticket.assigneeId ?? ""}
             disabled={!editable}
-            onChange={(e) => void update({ assigneeId: e.target.value || null }, e.target.value ? "Assignee updated" : "Unassigned")}
+            onChange={(e) =>
+              void update(
+                { assigneeId: e.target.value || null },
+                e.target.value ? "Assignee updated" : "Unassigned",
+              )
+            }
           >
             <option value="">Unassigned</option>
             {members.map((m) => (
@@ -145,7 +164,10 @@ export function TicketPanel({
           <ul className="flex flex-wrap gap-1.5" aria-label="Tags">
             {ticket.tags.length === 0 ? <li className="text-small text-text-subtle">No tags</li> : null}
             {ticket.tags.map((t) => (
-              <li key={t} className="inline-flex h-7 items-center gap-1 rounded-full bg-surface-2 pr-1 pl-2.5 text-small text-text">
+              <li
+                key={t}
+                className="inline-flex h-7 items-center gap-1 rounded-full bg-surface-2 pr-1 pl-2.5 text-small text-text"
+              >
                 <Tag aria-hidden className="size-3 text-text-subtle" />
                 {t}
                 {editable ? (
@@ -153,7 +175,9 @@ export function TicketPanel({
                     type="button"
                     className="flex size-6 cursor-pointer items-center justify-center rounded-full hover:bg-border"
                     aria-label={`Remove tag ${t}`}
-                    onClick={() => void update({ tags: ticket.tags.filter((x) => x !== t) }, `Tag “${t}” removed`)}
+                    onClick={() =>
+                      void update({ tags: ticket.tags.filter((x) => x !== t) }, `Tag “${t}” removed`)
+                    }
                   >
                     <X aria-hidden className="size-3" />
                   </button>
@@ -187,12 +211,20 @@ export function TicketPanel({
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-small">
           <dt className="text-text-muted">First response</dt>
           <dd className="text-right">
-            <SlaTimer due={ticket.firstResponseDue} respondedAt={ticket.firstRespondedAt} status={ticket.status} />
+            <SlaTimer
+              due={ticket.firstResponseDue}
+              respondedAt={ticket.firstRespondedAt}
+              status={ticket.status}
+            />
           </dd>
           <dt className="text-text-muted">Resolution due</dt>
-          <dd className="text-right text-text tabular">{ticket.resolutionDue ? formatDateTime(ticket.resolutionDue, me.workspace.timezone) : "None"}</dd>
+          <dd className="text-right text-text tabular">
+            {ticket.resolutionDue ? formatDateTime(ticket.resolutionDue, me.workspace.timezone) : "None"}
+          </dd>
           <dt className="text-text-muted">Opened</dt>
-          <dd className="text-right text-text tabular">{formatDateTime(ticket.createdAt, me.workspace.timezone)}</dd>
+          <dd className="text-right text-text tabular">
+            {formatDateTime(ticket.createdAt, me.workspace.timezone)}
+          </dd>
           {ticket.reopenedCount > 0 ? (
             <>
               <dt className="text-text-muted">Reopened</dt>
@@ -206,12 +238,17 @@ export function TicketPanel({
         <Card className="flex flex-col gap-3 p-4">
           <div className="flex items-center justify-between">
             <h2 className="text-h4 text-text">Customer</h2>
-            <Link href={`/app/customers/${ticket.customer.id}`} className="text-small text-primary hover:underline">
+            <Link
+              href={`/app/customers/${ticket.customer.id}`}
+              className="text-small text-primary hover:underline"
+            >
               View profile
             </Link>
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-body font-medium text-text">{ticket.customer.name ?? ticket.customer.email}</span>
+            <span className="text-body font-medium text-text">
+              {ticket.customer.name ?? ticket.customer.email}
+            </span>
             <span className="flex items-center gap-1.5 text-small text-text-muted">
               <Mail aria-hidden className="size-3.5" />
               {ticket.customer.email}
@@ -224,13 +261,16 @@ export function TicketPanel({
             ) : null}
           </div>
           <p className="text-small text-text-muted tabular">
-            {formatNumber(ticket.customer.ticketCount)} tickets · {formatNumber(ticket.customer.openCount)} open
+            {formatNumber(ticket.customer.ticketCount)} tickets · {formatNumber(ticket.customer.openCount)}{" "}
+            open
           </p>
         </Card>
       ) : (
         <Card className="p-4">
           <h2 className="text-h4 text-text">Customer</h2>
-          <p className="mt-1 text-small text-text-muted">The sender could not be matched to a customer. Set the customer from Needs review.</p>
+          <p className="mt-1 text-small text-text-muted">
+            The sender could not be matched to a customer. Set the customer from Needs review.
+          </p>
         </Card>
       )}
 
@@ -250,7 +290,10 @@ export function TicketPanel({
           <ul className="flex flex-col gap-2">
             {ticket.related.map((r) => (
               <li key={r.id}>
-                <Link href={`/app/tickets/${r.id}`} className="flex items-center gap-2 rounded-control p-1 hover:bg-surface-2">
+                <Link
+                  href={`/app/tickets/${r.id}`}
+                  className="flex items-center gap-2 rounded-control p-1 hover:bg-surface-2"
+                >
                   <TicketKey value={r.key} />
                   <span className="min-w-0 flex-1 truncate text-small text-text">{r.subject}</span>
                   <TicketStatusChip status={r.status} />
@@ -266,7 +309,13 @@ export function TicketPanel({
           category={categoryLabel(ai.category)}
           confidence={ai.confidence ?? 0}
           reason={ai.aiReason ?? "No reason recorded"}
-          replyType={ai.replyType ? (REPLY_TYPE[ai.replyType] ?? ai.replyType) : ai.rerouted ? "New ticket, rerouted" : "New ticket"}
+          replyType={
+            ai.replyType
+              ? (REPLY_TYPE[ai.replyType] ?? ai.replyType)
+              : ai.rerouted
+                ? "New ticket, rerouted"
+                : "New ticket"
+          }
           model={ai.model ?? "Not recorded"}
           cost={formatUsd(ai.costUsd)}
         />

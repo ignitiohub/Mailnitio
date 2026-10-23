@@ -37,7 +37,10 @@ interface Dashboard {
     aiCostToday: { valueUsd: number; previousUsd: number; perEmailUsd: number };
   };
   days: { day: string; processed: number; failed: number; review: number }[];
-  categories: { series: { key: string; label: string }[]; days: { day: string; counts: Record<string, number> }[] };
+  categories: {
+    series: { key: string; label: string }[];
+    days: { day: string; counts: Record<string, number> }[];
+  };
   teams: { id: string; name: string; open: number; atRisk: number; breached: number }[];
   mailboxes: {
     id: string;
@@ -61,7 +64,9 @@ function dayLabel(day: string, style: "short" | "long") {
   const date = new Date(`${day}T12:00:00Z`);
   return new Intl.DateTimeFormat(
     "en-GB",
-    style === "short" ? { weekday: "short", timeZone: "UTC" } : { weekday: "long", day: "numeric", month: "short", timeZone: "UTC" },
+    style === "short"
+      ? { weekday: "short", timeZone: "UTC" }
+      : { weekday: "long", day: "numeric", month: "short", timeZone: "UTC" },
   ).format(date);
 }
 
@@ -90,7 +95,7 @@ function ModeBadge({ mode }: { mode: string }) {
 
 function DashboardSkeleton() {
   return (
-    <div className="flex flex-col gap-6" aria-busy="true" aria-label="Loading dashboard">
+    <div className="flex flex-col gap-6" role="status" aria-busy="true" aria-label="Loading dashboard">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }, (_, i) => (
           <KpiCardSkeleton key={i} />
@@ -107,7 +112,9 @@ function DashboardSkeleton() {
 export default function DashboardPage() {
   const { me } = useMe();
   const helpdesk = me.workspace.productInterest !== "send";
-  const { data, error, loading, refetch } = useApi<{ data: Dashboard }>(helpdesk ? "/v1/dashboard" : null, { pollMs: POLL_MS });
+  const { data, error, loading, refetch } = useApi<{ data: Dashboard }>(helpdesk ? "/v1/dashboard" : null, {
+    pollMs: POLL_MS,
+  });
   const d = data?.data;
 
   if (!helpdesk) return <GettingStarted />;
@@ -156,7 +163,10 @@ export default function DashboardPage() {
             <KpiCard
               label="Emails processed today"
               value={formatNumber(k.processedToday.value)}
-              delta={{ value: change(k.processedToday.value, k.processedToday.previous), label: "vs yesterday" }}
+              delta={{
+                value: change(k.processedToday.value, k.processedToday.previous),
+                label: "vs yesterday",
+              }}
               sparkline={d.days.map((x) => x.processed)}
             />
             <KpiCard
@@ -164,7 +174,10 @@ export default function DashboardPage() {
               value={
                 <>
                   {formatNumber(k.newTicketsToday.value)}
-                  <span className="text-h4 font-normal text-text-muted"> new · {formatNumber(k.appendedToday.value)} appended</span>
+                  <span className="text-h4 font-normal text-text-muted">
+                    {" "}
+                    new · {formatNumber(k.appendedToday.value)} appended
+                  </span>
                 </>
               }
               context={`${formatNumber(k.appendedToday.value)} follow-ups joined an existing ticket instead of opening a duplicate`}
@@ -190,13 +203,25 @@ export default function DashboardPage() {
             <KpiCard
               label="Failures today"
               value={formatNumber(k.failuresToday.value)}
-              delta={{ value: change(k.failuresToday.value, k.failuresToday.previous), goodDirection: "down", label: "vs yesterday" }}
-              context={k.failuresToday.value > 0 ? "Failed emails can be replayed from the inbox log" : "No processing failures"}
+              delta={{
+                value: change(k.failuresToday.value, k.failuresToday.previous),
+                goodDirection: "down",
+                label: "vs yesterday",
+              }}
+              context={
+                k.failuresToday.value > 0
+                  ? "Failed emails can be replayed from the inbox log"
+                  : "No processing failures"
+              }
             />
             <KpiCard
               label="AI cost today"
               value={formatUsd(k.aiCostToday.valueUsd)}
-              delta={{ value: change(k.aiCostToday.valueUsd, k.aiCostToday.previousUsd), goodDirection: "down", label: "vs yesterday" }}
+              delta={{
+                value: change(k.aiCostToday.valueUsd, k.aiCostToday.previousUsd),
+                goodDirection: "down",
+                label: "vs yesterday",
+              }}
               context={`${formatUsd(k.aiCostToday.perEmailUsd)} per email processed`}
             />
           </section>
@@ -211,7 +236,9 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 {d.categories.series.length === 0 ? (
-                  <p className="py-12 text-center text-body text-text-muted">No classified emails in the last 7 days.</p>
+                  <p className="py-12 text-center text-body text-text-muted">
+                    No classified emails in the last 7 days.
+                  </p>
                 ) : (
                   <StackedBarChart
                     label="Emails by category, last 7 days"
@@ -239,7 +266,12 @@ export default function DashboardPage() {
                     key: t.id,
                     label: t.name,
                     value: t.open,
-                    detail: t.breached > 0 ? `${t.breached} overdue` : t.atRisk > 0 ? `${t.atRisk} at risk` : undefined,
+                    detail:
+                      t.breached > 0
+                        ? `${t.breached} overdue`
+                        : t.atRisk > 0
+                          ? `${t.atRisk} at risk`
+                          : undefined,
                   }))}
                   valueLabel={(v) => formatNumber(v)}
                 />
@@ -265,7 +297,9 @@ export default function DashboardPage() {
                         {m.ackEnabled ? " · Acknowledgements on" : " · Acknowledgements off"}
                       </span>
                     </div>
-                    <span className="text-small text-text-muted tabular">{formatNumber(m.processedToday)} today</span>
+                    <span className="text-small text-text-muted tabular">
+                      {formatNumber(m.processedToday)} today
+                    </span>
                     {m.health !== "ok" ? (
                       <Badge tone="danger">
                         <CircleAlert aria-hidden />

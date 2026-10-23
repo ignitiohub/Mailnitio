@@ -84,14 +84,22 @@ export function useShortcut(key: string, handler: () => void) {
   }, [key]);
 }
 
-export function ShortcutsHelp({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+export function ShortcutsHelp({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   return (
     <Modal open={open} onOpenChange={onOpenChange} title="Keyboard shortcuts">
       <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2">
         {SHORTCUTS.map((s) => (
           <div key={s.keys} className="contents">
             <dt>
-              <kbd className="rounded-control border border-border bg-surface-2 px-1.5 py-0.5 font-mono text-caption text-text">{s.keys}</kbd>
+              <kbd className="rounded-control border border-border bg-surface-2 px-1.5 py-0.5 font-mono text-caption text-text">
+                {s.keys}
+              </kbd>
             </dt>
             <dd className="text-body text-text-muted">{s.action}</dd>
           </div>

@@ -69,7 +69,7 @@ function ReviewDetail({ row, onDone }: { row: ReviewRow; onDone: () => void }) {
   if (email.error) return <ErrorState referenceId={email.error.referenceId} onRetry={email.refetch} />;
   if (!e) {
     return (
-      <div className="flex flex-col gap-3" aria-busy="true" aria-label="Loading email">
+      <div className="flex flex-col gap-3" role="status" aria-busy="true" aria-label="Loading email">
         <Skeleton className="h-7 w-2/3" />
         <Skeleton className="h-32 w-full rounded-card" />
         <Skeleton className="h-64 w-full rounded-card" />
@@ -96,7 +96,8 @@ function ReviewDetail({ row, onDone }: { row: ReviewRow; onDone: () => void }) {
         </div>
         <h2 className="text-h3 break-words text-text">{e.subject}</h2>
         <p className="text-small text-text-muted">
-          {e.senderName ? `${e.senderName} <${e.sender}>` : e.sender} · {formatDateTime(e.receivedAt, me.workspace.timezone)}
+          {e.senderName ? `${e.senderName} <${e.sender}>` : e.sender} ·{" "}
+          {formatDateTime(e.receivedAt, me.workspace.timezone)}
         </p>
       </div>
       {e.escalationReason ? (
@@ -108,11 +109,17 @@ function ReviewDetail({ row, onDone }: { row: ReviewRow; onDone: () => void }) {
       <Card className="flex flex-col gap-3 p-4">
         <p className="text-caption text-primary">AI suggestion</p>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="text-h4 text-text">{e.category ? categoryLabel(e.category) : "Not classified"}</span>
+          <span className="text-h4 text-text">
+            {e.category ? categoryLabel(e.category) : "Not classified"}
+          </span>
           <span className="text-small text-text-muted">{row.teamName ?? "No team"}</span>
         </div>
         {e.categoryConfidence !== null ? (
-          <ConfidenceBar value={e.categoryConfidence} high={config?.thresholds.high} low={config?.thresholds.low} />
+          <ConfidenceBar
+            value={e.categoryConfidence}
+            high={config?.thresholds.high}
+            low={config?.thresholds.low}
+          />
         ) : null}
         <p className="text-body text-text-muted">{e.aiReason ?? e.summary ?? "No reason recorded."}</p>
       </Card>
@@ -126,12 +133,18 @@ function ReviewDetail({ row, onDone }: { row: ReviewRow; onDone: () => void }) {
       ) : null}
       <div className="flex flex-wrap gap-x-4 gap-y-2 text-small">
         {e.ticket ? (
-          <Link href={`/app/tickets/${e.ticket.id}`} className="inline-flex items-center gap-1 text-primary hover:underline">
+          <Link
+            href={`/app/tickets/${e.ticket.id}`}
+            className="inline-flex items-center gap-1 text-primary hover:underline"
+          >
             Open {e.ticket.key}
             <ExternalLink aria-hidden className="size-3.5" />
           </Link>
         ) : null}
-        <Link href={`/app/inbox-log/${e.id}`} className="inline-flex items-center gap-1 text-primary hover:underline">
+        <Link
+          href={`/app/inbox-log/${e.id}`}
+          className="inline-flex items-center gap-1 text-primary hover:underline"
+        >
           Decision trail
           <ExternalLink aria-hidden className="size-3.5" />
         </Link>
@@ -149,7 +162,8 @@ function ReviewDetail({ row, onDone }: { row: ReviewRow; onDone: () => void }) {
         />
       ) : (
         <p className="rounded-card border border-border bg-surface-2 p-4 text-small text-text-muted">
-          Reviewers, supervisors and admins can approve or correct AI decisions. Ask a workspace admin if you need access.
+          Reviewers, supervisors and admins can approve or correct AI decisions. Ask a workspace admin if you
+          need access.
         </p>
       )}
     </div>
@@ -161,7 +175,9 @@ function ReviewScreen() {
   const params = useSearchParams();
   const desktop = useMediaQuery("(min-width: 1024px)");
   const { categoryLabel } = useLookups();
-  const list = useApi<{ data: ReviewRow[]; nextCursor: string | null }>("/v1/reviews?limit=50", { pollMs: POLL_MS });
+  const list = useApi<{ data: ReviewRow[]; nextCursor: string | null }>("/v1/reviews?limit=50", {
+    pollMs: POLL_MS,
+  });
   const rows = list.data?.data ?? [];
   const fresh = useNewIds(list.data ? rows.map((r) => r.id) : undefined);
   const itemId = params.get("item");
@@ -196,7 +212,11 @@ function ReviewScreen() {
   const listPane = (
     <Card className="overflow-hidden">
       {list.loading && !list.data ? (
-        <ul aria-busy="true" aria-label="Loading review items" className="flex flex-col divide-y divide-border">
+        <ul
+          aria-busy="true"
+          aria-label="Loading review items"
+          className="flex flex-col divide-y divide-border"
+        >
           {Array.from({ length: 6 }, (_, i) => (
             <li key={i} className="flex flex-col gap-2 p-4">
               <Skeleton className="h-4 w-3/4" />
@@ -218,7 +238,10 @@ function ReviewScreen() {
           }
         />
       ) : (
-        <ul className="flex max-h-[calc(100vh-240px)] flex-col divide-y divide-border overflow-y-auto" aria-label="Review queue">
+        <ul
+          className="flex max-h-[calc(100vh-240px)] flex-col divide-y divide-border overflow-y-auto"
+          aria-label="Review queue"
+        >
           {rows.map((r) => (
             <li key={r.id} id={`review-${r.id}`}>
               <button
@@ -232,14 +255,18 @@ function ReviewScreen() {
                 )}
               >
                 <span className="flex items-center gap-2">
-                  {r.escalated ? <ShieldAlert aria-label="Escalated" className="size-4 shrink-0 text-danger" /> : null}
+                  {r.escalated ? (
+                    <ShieldAlert aria-label="Escalated" className="size-4 shrink-0 text-danger" />
+                  ) : null}
                   <span className="min-w-0 flex-1 truncate font-medium text-text">{r.subject}</span>
                   <When at={r.receivedAt} className="shrink-0 text-caption font-normal text-text-subtle" />
                 </span>
                 <span className="truncate text-small text-text-muted">{r.senderName ?? r.sender}</span>
                 <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-caption font-normal text-text-subtle">
                   <span>{r.category ? categoryLabel(r.category) : "Not classified"}</span>
-                  {r.confidence !== null ? <span className="tabular">{Math.round(r.confidence * 100)}%</span> : null}
+                  {r.confidence !== null ? (
+                    <span className="tabular">{Math.round(r.confidence * 100)}%</span>
+                  ) : null}
                   <span>{r.reasons.map((x) => REVIEW_REASON_LABELS[x] ?? x).join(", ")}</span>
                   {r.ticketKey ? <TicketKey value={r.ticketKey} className="text-caption" /> : null}
                 </span>
@@ -264,7 +291,11 @@ function ReviewScreen() {
             {selected ? (
               <ReviewDetail key={selected.id} row={selected} onDone={done} />
             ) : (
-              <EmptyState icon={CheckCircle2} title="Choose an item" description="Pick an email on the left to review it." />
+              <EmptyState
+                icon={CheckCircle2}
+                title="Choose an item"
+                description="Pick an email on the left to review it."
+              />
             )}
           </Card>
         </div>

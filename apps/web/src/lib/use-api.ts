@@ -48,7 +48,10 @@ export function useApi<T>(path: string | null, options: { pollMs?: number } = {}
       .catch((err: unknown) => {
         if (request !== current.current) return;
         // A failed background refresh keeps showing the last good data.
-        if (!background) setError(err instanceof ApiError ? err : new ApiError(0, "internal_error", "Something went wrong."));
+        if (!background)
+          setError(
+            err instanceof ApiError ? err : new ApiError(0, "internal_error", "Something went wrong."),
+          );
       })
       .finally(() => {
         if (request !== current.current) return;

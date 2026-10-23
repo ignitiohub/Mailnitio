@@ -56,7 +56,13 @@ export const appNav: AppNavGroup[] = [
     items: [
       { label: "Users and audit", href: "/app/settings/members", icon: "UserCog" },
       { label: "Usage", href: "/app/usage", icon: "Gauge" },
-      { label: "Email simulator", href: "/app/simulator", icon: "FlaskConical", product: "helpdesk", roles: ["owner", "admin"] },
+      {
+        label: "Email simulator",
+        href: "/app/simulator",
+        icon: "FlaskConical",
+        product: "helpdesk",
+        roles: ["owner", "admin"],
+      },
       { label: "Settings", href: "/app/settings", icon: "Settings" },
     ],
   },

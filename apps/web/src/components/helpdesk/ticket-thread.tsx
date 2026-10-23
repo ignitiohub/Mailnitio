@@ -12,7 +12,9 @@ function describeEvent(e: TicketEvent, memberName: (id: string) => string | unde
   const d = e.data;
   switch (e.type) {
     case "created":
-      return d.splitFrom ? `${who} split this from ${d.splitFrom}` : `Mailnitio created the ticket for ${String(d.team ?? "a team")}`;
+      return d.splitFrom
+        ? `${who} split this from ${d.splitFrom}`
+        : `Mailnitio created the ticket for ${String(d.team ?? "a team")}`;
     case "status":
       return `${who} changed status to ${TICKET_STATUS_LABELS[String(d.to)] ?? d.to}`;
     case "priority":
@@ -20,7 +22,9 @@ function describeEvent(e: TicketEvent, memberName: (id: string) => string | unde
     case "team":
       return `${who} moved the ticket to ${String(d.to)}`;
     case "assignee":
-      return d.to ? `${who} assigned the ticket to ${memberName(String(d.to)) ?? "a teammate"}` : `${who} unassigned the ticket`;
+      return d.to
+        ? `${who} assigned the ticket to ${memberName(String(d.to)) ?? "a teammate"}`
+        : `${who} unassigned the ticket`;
     case "tags":
       return `${who} updated tags`;
     case "reopened":
@@ -28,7 +32,9 @@ function describeEvent(e: TicketEvent, memberName: (id: string) => string | unde
     case "linked":
       return d.with ? `${who} linked ${String(d.with)}` : "Mailnitio linked a related ticket";
     case "merged":
-      return d.into ? `${who} merged this into ${String(d.into)}` : `${who} merged ${String(d.from)} into this ticket`;
+      return d.into
+        ? `${who} merged this into ${String(d.into)}`
+        : `${who} merged ${String(d.from)} into this ticket`;
     case "split":
       return `${who} split ${String(d.messages)} message(s) into ${String(d.into)}`;
     case "review":
@@ -51,15 +57,27 @@ function Message({ m, timezone, mailbox }: { m: TicketMessage; timezone: string;
       aria-label={`${label} from ${m.fromName ?? m.fromAddr ?? "unknown"}`}
       className={cn(
         "flex flex-col gap-2 rounded-card border p-4",
-        note ? "border-warning/30 bg-warning-soft" : outbound ? "border-primary/20 bg-primary-soft/50" : "border-border bg-surface",
+        note
+          ? "border-warning/30 bg-warning-soft"
+          : outbound
+            ? "border-primary/20 bg-primary-soft/50"
+            : "border-border bg-surface",
         outbound && "md:ml-10",
       )}
     >
       <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <span className="flex items-center gap-2 text-body font-medium text-text">
-          <Icon aria-hidden className={cn("size-4 stroke-[1.75]", note ? "text-warning" : outbound ? "text-primary" : "text-text-muted")} />
+          <Icon
+            aria-hidden
+            className={cn(
+              "size-4 stroke-[1.75]",
+              note ? "text-warning" : outbound ? "text-primary" : "text-text-muted",
+            )}
+          />
           {m.fromName ?? m.fromAddr ?? "Unknown sender"}
-          {!note && m.fromAddr && m.fromName ? <span className="text-small font-normal text-text-subtle">{m.fromAddr}</span> : null}
+          {!note && m.fromAddr && m.fromName ? (
+            <span className="text-small font-normal text-text-subtle">{m.fromAddr}</span>
+          ) : null}
         </span>
         <time dateTime={m.createdAt} className="text-caption font-normal text-text-subtle tabular">
           {formatDateTime(m.createdAt, timezone)}
@@ -68,7 +86,10 @@ function Message({ m, timezone, mailbox }: { m: TicketMessage; timezone: string;
       <p className="prose-width text-body whitespace-pre-wrap text-text">{m.bodyText}</p>
       {outbound ? (
         <p className="text-caption font-normal text-text-subtle">
-          {label} {m.sentStatus === "simulated" ? `recorded (sending from ${m.fromAddr ?? mailbox ?? "the mailbox"} starts with live email)` : `sent from ${m.fromAddr ?? mailbox}`}
+          {label}{" "}
+          {m.sentStatus === "simulated"
+            ? `recorded (sending from ${m.fromAddr ?? mailbox ?? "the mailbox"} starts with live email)`
+            : `sent from ${m.fromAddr ?? mailbox}`}
         </p>
       ) : note ? (
         <p className="text-caption font-normal text-text-subtle">Only visible to your team</p>

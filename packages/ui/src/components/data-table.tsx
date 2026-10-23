@@ -285,14 +285,19 @@ export function DataTable<T>({
                           key={row.id}
                           data-state={row.getIsSelected() ? "selected" : undefined}
                           aria-current={activeRowId === row.id ? "true" : undefined}
-                          ref={activeRowId === row.id ? (el) => el?.scrollIntoView({ block: "nearest" }) : undefined}
+                          ref={
+                            activeRowId === row.id
+                              ? (el) => el?.scrollIntoView({ block: "nearest" })
+                              : undefined
+                          }
                           onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                           className={cn(
                             "h-[var(--row-height)] border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-2",
                             "data-[state=selected]:bg-primary-soft",
                             onRowClick && "cursor-pointer",
                             highlightIds?.has(row.id) && "animate-row-highlight",
-                            activeRowId === row.id && "bg-surface-2 outline-2 -outline-offset-2 outline-primary",
+                            activeRowId === row.id &&
+                              "bg-surface-2 outline-2 -outline-offset-2 outline-primary",
                           )}
                         >
                           {row.getVisibleCells().map((cell) => {

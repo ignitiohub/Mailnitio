@@ -23,14 +23,22 @@ interface CustomerHit {
   company: string | null;
 }
 
-function CustomerPicker({ value, onChange }: { value: CustomerHit | null; onChange: (c: CustomerHit | null) => void }) {
+function CustomerPicker({
+  value,
+  onChange,
+}: {
+  value: CustomerHit | null;
+  onChange: (c: CustomerHit | null) => void;
+}) {
   const [search, setSearch] = useState("");
   const [q, setQ] = useState("");
   useEffect(() => {
     const t = window.setTimeout(() => setQ(search.trim()), 300);
     return () => window.clearTimeout(t);
   }, [search]);
-  const hits = useApi<{ data: CustomerHit[] }>(q.length >= 2 ? `/v1/customers?limit=5&q=${encodeURIComponent(q)}` : null);
+  const hits = useApi<{ data: CustomerHit[] }>(
+    q.length >= 2 ? `/v1/customers?limit=5&q=${encodeURIComponent(q)}` : null,
+  );
 
   if (value) {
     return (
@@ -46,7 +54,12 @@ function CustomerPicker({ value, onChange }: { value: CustomerHit | null; onChan
   }
   return (
     <div className="flex flex-col gap-2">
-      <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or email" aria-label="Search customers" />
+      <Input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search by name or email"
+        aria-label="Search customers"
+      />
       {q.length >= 2 ? (
         <ul className="flex flex-col rounded-control border border-border" aria-label="Matching customers">
           {hits.loading ? <li className="px-3 py-2 text-small text-text-subtle">Searching…</li> : null}
@@ -142,7 +155,9 @@ export function ReviewActions({ target, onDone }: { target: ReviewTarget; onDone
         method: "POST",
         json: { ...body, note: note.trim() || undefined },
       });
-      toast.success("Decision corrected", { description: "The ticket is updated and the change is in the audit log." });
+      toast.success("Decision corrected", {
+        description: "The ticket is updated and the change is in the audit log.",
+      });
       onDone();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Could not save the correction. Try again.");
@@ -154,8 +169,15 @@ export function ReviewActions({ target, onDone }: { target: ReviewTarget; onDone
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2 rounded-card border border-border bg-surface-2 p-4">
-        <p className="text-body text-text">If the AI got it right, approve it. The ticket stays where it is.</p>
-        <Button onClick={() => void approve()} loading={busy === "approve"} disabled={busy !== null} className="self-start">
+        <p className="text-body text-text">
+          If the AI got it right, approve it. The ticket stays where it is.
+        </p>
+        <Button
+          onClick={() => void approve()}
+          loading={busy === "approve"}
+          disabled={busy !== null}
+          className="self-start"
+        >
           <Check aria-hidden />
           Approve decision
         </Button>
@@ -188,9 +210,19 @@ export function ReviewActions({ target, onDone }: { target: ReviewTarget; onDone
         <Field
           label="Link to an existing ticket"
           optional
-          helper={target.ticketKey ? `Moves this email off ${target.ticketKey} and onto the ticket you enter.` : "Adds this email to the ticket you enter."}
+          helper={
+            target.ticketKey
+              ? `Moves this email off ${target.ticketKey} and onto the ticket you enter.`
+              : "Adds this email to the ticket you enter."
+          }
         >
-          <Input value={linkKey} onChange={(e) => setLinkKey(e.target.value)} placeholder="MN-1042" className="font-mono" disabled={split} />
+          <Input
+            value={linkKey}
+            onChange={(e) => setLinkKey(e.target.value)}
+            placeholder="MN-1042"
+            className="font-mono"
+            disabled={split}
+          />
         </Field>
         <Checkbox
           label="Split into a new ticket"
@@ -199,18 +231,38 @@ export function ReviewActions({ target, onDone }: { target: ReviewTarget; onDone
           disabled={Boolean(linkKey.trim()) || !target.ticketKey}
           onChange={(e) => setSplit(e.target.checked)}
         />
-        <Field label="Customer" optional helper={target.customer ? `Currently ${target.customer.name ?? target.customer.email}` : "No customer matched this sender."}>
+        <Field
+          label="Customer"
+          optional
+          helper={
+            target.customer
+              ? `Currently ${target.customer.name ?? target.customer.email}`
+              : "No customer matched this sender."
+          }
+        >
           <CustomerPicker value={customer} onChange={setCustomer} />
         </Field>
         <Field label="Note for the audit log" optional>
-          <Textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} placeholder="Why the decision changed" />
+          <Textarea
+            rows={2}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            maxLength={500}
+            placeholder="Why the decision changed"
+          />
         </Field>
         {error ? (
           <p role="alert" className="text-small text-danger">
             {error}
           </p>
         ) : null}
-        <Button type="submit" variant="secondary" loading={busy === "override"} disabled={!changed || busy !== null} className="self-start">
+        <Button
+          type="submit"
+          variant="secondary"
+          loading={busy === "override"}
+          disabled={!changed || busy !== null}
+          className="self-start"
+        >
           Save correction
         </Button>
       </form>

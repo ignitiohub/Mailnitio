@@ -32,7 +32,13 @@ const PAGES: Item[] = [
 ];
 
 /** ⌘/Ctrl+K and "/" open global search: tickets (key or subject), emails (sender or subject), customers. */
-export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+export function CommandPalette({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Results | null>(null);
@@ -44,7 +50,11 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
     if (!open) {
       setQ("");
       setResults(null);
+      return;
     }
+    // Focus the search field once the dialog has mounted (Radix would focus the close button first).
+    const t = window.setTimeout(() => input.current?.focus(), 0);
+    return () => window.clearTimeout(t);
   }, [open]);
 
   useEffect(() => {
@@ -65,12 +75,34 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
   const items = useMemo<Item[]>(() => {
     if (!results) return PAGES.filter((p) => !q || p.label.toLowerCase().includes(q.toLowerCase()));
     return [
-      ...results.tickets.map((t) => ({ id: `t-${t.id}`, group: "Tickets", label: t.subject, mono: t.key, href: `/app/tickets/${t.id}`, icon: Inbox })),
-      ...results.emails.map((e) => ({ id: `e-${e.id}`, group: "Emails", label: e.subject, detail: e.sender, href: `/app/inbox-log/${e.id}`, icon: Mail })),
-      ...results.customers.map((c) => ({ id: `c-${c.id}`, group: "Customers", label: c.name ?? c.email, detail: c.email, href: `/app/customers/${c.id}`, icon: Contact })),
+      ...results.tickets.map((t) => ({
+        id: `t-${t.id}`,
+        group: "Tickets",
+        label: t.subject,
+        mono: t.key,
+        href: `/app/tickets/${t.id}`,
+        icon: Inbox,
+      })),
+      ...results.emails.map((e) => ({
+        id: `e-${e.id}`,
+        group: "Emails",
+        label: e.subject,
+        detail: e.sender,
+        href: `/app/inbox-log/${e.id}`,
+        icon: Mail,
+      })),
+      ...results.customers.map((c) => ({
+        id: `c-${c.id}`,
+        group: "Customers",
+        label: c.name ?? c.email,
+        detail: c.email,
+        href: `/app/customers/${c.id}`,
+        icon: Contact,
+      })),
     ];
   }, [results, q]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset the highlight when the results change
   useEffect(() => setActive(0), [items.length]);
 
   function go(item: Item | undefined) {
@@ -94,13 +126,22 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
 
   let lastGroup = "";
   return (
-    <Modal open={open} onOpenChange={onOpenChange} title="Search" description="Find a ticket by number or subject, an email by sender or subject, or a customer." className="max-w-xl">
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Search"
+      description="Find a ticket by number or subject, an email by sender or subject, or a customer."
+      className="max-w-xl"
+    >
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: arrow keys from the combobox input bubble here */}
       <div className="flex flex-col gap-3" onKeyDown={onKeyDown}>
         <div className="relative">
-          <Search aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 stroke-[1.75] text-text-subtle" />
+          <Search
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 stroke-[1.75] text-text-subtle"
+          />
           <input
             ref={input}
-            autoFocus
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="MN-1042, a sender or a subject"
@@ -126,7 +167,9 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
               lastGroup = item.group;
               return (
                 <div key={item.id}>
-                  {header ? <p className="px-2 pt-2 pb-1 text-overline text-text-subtle uppercase">{header}</p> : null}
+                  {header ? (
+                    <p className="px-2 pt-2 pb-1 text-overline text-text-subtle uppercase">{header}</p>
+                  ) : null}
                   <div
                     id={`cmd-${item.id}`}
                     role="option"
@@ -140,7 +183,9 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
                     <item.icon aria-hidden className="size-4 shrink-0 stroke-[1.75] text-text-muted" />
                     {item.mono ? <TicketKey value={item.mono} /> : null}
                     <span className="min-w-0 flex-1 truncate text-body text-text">{item.label}</span>
-                    {item.detail ? <span className="max-w-40 truncate text-small text-text-subtle">{item.detail}</span> : null}
+                    {item.detail ? (
+                      <span className="max-w-40 truncate text-small text-text-subtle">{item.detail}</span>
+                    ) : null}
                     {i === active ? <CornerDownLeft aria-hidden className="size-4 text-text-subtle" /> : null}
                   </div>
                 </div>
@@ -156,7 +201,12 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
 export function SearchButton({ onClick }: { onClick: () => void }) {
   return (
     <Tooltip content="Search" shortcut="Ctrl K">
-      <Button variant="secondary" size="sm" onClick={onClick} className="w-56 justify-start gap-2 text-text-subtle max-lg:hidden">
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={onClick}
+        className="w-56 justify-start gap-2 text-text-subtle max-lg:hidden"
+      >
         <Search aria-hidden />
         <span className="flex-1 text-left">Search tickets, emails…</span>
         <kbd className="font-mono text-[11px]">/</kbd>

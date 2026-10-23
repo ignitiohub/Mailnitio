@@ -76,7 +76,8 @@ export function LookupsProvider({ children }: { children: ReactNode }) {
       teams: teamList,
       members: members.data?.data ?? [],
       ready: !config.loading && !teams.loading && !members.loading,
-      categoryLabel: (key) => (key ? (categories.find((c) => c.key === key)?.label ?? key.replaceAll("_", " ")) : "Unclassified"),
+      categoryLabel: (key) =>
+        key ? (categories.find((c) => c.key === key)?.label ?? key.replaceAll("_", " ")) : "Unclassified",
       teamByKey: (key) => teamList.find((t) => t.key === key),
       refresh,
     };

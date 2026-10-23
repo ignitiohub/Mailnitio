@@ -4,11 +4,11 @@ import {
   Banner,
   Button,
   Checkbox,
+  Drawer,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Drawer,
   ErrorState,
   Field,
   Input,
@@ -91,7 +91,13 @@ function TicketKeyDialog({
     >
       <form onSubmit={submit} className="flex flex-col gap-4">
         <Field label="Ticket number" error={error} required>
-          <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="MN-1042" className="font-mono" autoFocus />
+          <Input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="MN-1042"
+            className="font-mono"
+            autoFocus
+          />
         </Field>
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
@@ -143,7 +149,11 @@ function SplitDialog({
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => void split()} loading={busy} disabled={selected.length === 0 || selected.length === inbound.length}>
+          <Button
+            onClick={() => void split()}
+            loading={busy}
+            disabled={selected.length === 0 || selected.length === inbound.length}
+          >
             Split {selected.length > 0 ? `${selected.length} email${selected.length === 1 ? "" : "s"}` : ""}
           </Button>
         </>
@@ -157,7 +167,9 @@ function SplitDialog({
             label={m.subject ?? ticket.subject}
             description={m.bodyText.slice(0, 120)}
             checked={selected.includes(m.id)}
-            onChange={(e) => setSelected((s) => (e.target.checked ? [...s, m.id] : s.filter((x) => x !== m.id)))}
+            onChange={(e) =>
+              setSelected((s) => (e.target.checked ? [...s, m.id] : s.filter((x) => x !== m.id)))
+            }
           />
         ))}
       </fieldset>
@@ -170,7 +182,7 @@ function SplitDialog({
 
 function TicketSkeleton() {
   return (
-    <div className="flex flex-col gap-6" aria-busy="true" aria-label="Loading ticket">
+    <div className="flex flex-col gap-6" role="status" aria-busy="true" aria-label="Loading ticket">
       <div className="flex flex-col gap-2">
         <Skeleton className="h-4 w-24" />
         <Skeleton className="h-9 w-2/3" />
@@ -259,13 +271,23 @@ export default function TicketPage() {
     }
   }
 
-  const panel = <TicketPanel ticket={t} editable={editable && !merged} onChange={onChange} onLink={() => setDialog("link")} />;
+  const panel = (
+    <TicketPanel
+      ticket={t}
+      editable={editable && !merged}
+      onChange={onChange}
+      onLink={() => setDialog("link")}
+    />
+  );
   const inboundCount = t.messages.filter((m) => m.direction === "inbound").length;
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <Link href="/app/tickets" className="inline-flex w-fit items-center gap-1.5 text-small text-text-muted hover:text-text">
+        <Link
+          href="/app/tickets"
+          className="inline-flex w-fit items-center gap-1.5 text-small text-text-muted hover:text-text"
+        >
           <ArrowLeft aria-hidden className="size-4" />
           Tickets
         </Link>
@@ -353,7 +375,8 @@ export default function TicketPage() {
       ) : null}
       {t.mailboxMode === "shadow" ? (
         <Banner tone="warning" title="Shadow mode">
-          {t.mailbox ?? "This mailbox"} is in shadow mode: Mailnitio records decisions but does not send acknowledgements.
+          {t.mailbox ?? "This mailbox"} is in shadow mode: Mailnitio records decisions but does not send
+          acknowledgements.
         </Banner>
       ) : null}
 
@@ -393,7 +416,12 @@ export default function TicketPage() {
         submitLabel="Link ticket"
         onSubmit={link}
       />
-      <SplitDialog ticket={t} open={dialog === "split"} onOpenChange={(o) => setDialog(o ? "split" : null)} onSplit={split} />
+      <SplitDialog
+        ticket={t}
+        open={dialog === "split"}
+        onOpenChange={(o) => setDialog(o ? "split" : null)}
+        onSplit={split}
+      />
     </div>
   );
 }

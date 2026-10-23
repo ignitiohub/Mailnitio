@@ -31,7 +31,9 @@ export function TicketStatusChip({ status }: { status: string }) {
     <span className="inline-flex items-center gap-1.5">
       <StatusChip status={chip} variant="dot" />
       {status === "new" || status === "on_hold" ? (
-        <span className="text-caption font-normal text-text-subtle">{status === "new" ? "New" : "On hold"}</span>
+        <span className="text-caption font-normal text-text-subtle">
+          {status === "new" ? "New" : "On hold"}
+        </span>
       ) : null}
     </span>
   );
@@ -42,7 +44,10 @@ export function EmailChip({ chip }: { chip: string }) {
   return <StatusChip status={chip as Status} />;
 }
 
-const PRIORITY: Record<string, { label: string; tone: "danger" | "warning" | "neutral" | "outline"; icon: typeof ArrowUp }> = {
+const PRIORITY: Record<
+  string,
+  { label: string; tone: "danger" | "warning" | "neutral" | "outline"; icon: typeof ArrowUp }
+> = {
   urgent: { label: "Urgent", tone: "danger", icon: ChevronsUp },
   high: { label: "High", tone: "warning", icon: ArrowUp },
   medium: { label: "Medium", tone: "neutral", icon: Minus },
@@ -50,7 +55,7 @@ const PRIORITY: Record<string, { label: string; tone: "danger" | "warning" | "ne
 };
 
 export function PriorityBadge({ priority }: { priority: string }) {
-  const p = PRIORITY[priority] ?? PRIORITY.medium!;
+  const p = PRIORITY[priority] ?? (PRIORITY.medium as (typeof PRIORITY)[string]);
   return (
     <Badge tone={p.tone}>
       <p.icon aria-hidden />
@@ -59,7 +64,12 @@ export function PriorityBadge({ priority }: { priority: string }) {
   );
 }
 
-export const PRIORITY_LABELS: Record<string, string> = { urgent: "Urgent", high: "High", medium: "Medium", low: "Low" };
+export const PRIORITY_LABELS: Record<string, string> = {
+  urgent: "Urgent",
+  high: "High",
+  medium: "Medium",
+  low: "Low",
+};
 
 function useNow(intervalMs = 30_000) {
   const [now, setNow] = useState(() => new Date());
@@ -91,7 +101,8 @@ export function SlaTimer({
   const now = useNow();
   if (!due) return <span className="text-small text-text-subtle">No SLA</span>;
   if (respondedAt) return <span className="text-small text-text-muted">Responded</span>;
-  if (status === "resolved" || status === "closed") return <span className="text-small text-text-subtle">Done</span>;
+  if (status === "resolved" || status === "closed")
+    return <span className="text-small text-text-subtle">Done</span>;
   const left = new Date(due).getTime() - now.getTime();
   const state = left < 0 ? "breached" : left < 3_600_000 ? "risk" : "ok";
   return (
@@ -115,7 +126,11 @@ export function When({ at, className }: { at: string | Date | null | undefined; 
   if (!at) return <span className={cn("text-text-subtle", className)}>Never</span>;
   const iso = typeof at === "string" ? at : at.toISOString();
   return (
-    <time dateTime={iso} title={formatDateTime(iso, me.workspace.timezone)} className={cn("tabular", className)}>
+    <time
+      dateTime={iso}
+      title={formatDateTime(iso, me.workspace.timezone)}
+      className={cn("tabular", className)}
+    >
       {formatRelativeTime(iso)}
     </time>
   );

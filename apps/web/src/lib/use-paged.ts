@@ -33,7 +33,8 @@ export function usePaged(base: string, initialSize = 25) {
 /** Build a query string from defined, non-empty values. */
 export function query(params: Record<string, string | number | null | undefined>): string {
   const sp = new URLSearchParams();
-  for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== null && v !== "") sp.set(k, String(v));
+  for (const [k, v] of Object.entries(params))
+    if (v !== undefined && v !== null && v !== "") sp.set(k, String(v));
   const s = sp.toString();
   return s ? `?${s}` : "";
 }

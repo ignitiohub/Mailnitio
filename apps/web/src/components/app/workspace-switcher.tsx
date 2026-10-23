@@ -61,7 +61,9 @@ export function WorkspaceSwitcher() {
         {(workspaces ?? [{ id: me.workspace.id, name: me.workspace.name }]).map((w) => (
           <DropdownMenuItem key={w.id} onSelect={() => void switchTo(w.id)}>
             <span className="flex-1 truncate">{w.name}</span>
-            {w.id === me.workspace.id ? <Check aria-label="Current workspace" className="!text-primary" /> : null}
+            {w.id === me.workspace.id ? (
+              <Check aria-label="Current workspace" className="!text-primary" />
+            ) : null}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
