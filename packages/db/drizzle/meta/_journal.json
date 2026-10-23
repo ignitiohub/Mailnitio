@@ -29,6 +29,20 @@
       "when": 1792709604715,
       "tag": "0003_lead_pipeline",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792770936632,
+      "tag": "0004_helpdesk",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792770943526,
+      "tag": "0005_helpdesk_rls",
+      "breakpoints": true
     }
   ]
 }
