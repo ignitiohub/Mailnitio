@@ -116,7 +116,8 @@ export async function seedWorkspace(options: SeedOptions): Promise<SeedResult> {
     return { workspaceId: workspace.id, created: wasCreated, ownerId, agentIds };
   });
 
-  // 2. Reset (optional): clear helpdesk data; identity, members and the audit log are kept.
+  // 2. Reset (optional): clear helpdesk data. Identity, members, the audit log and usage events (append-only
+  // billing records) are kept; usage is keyed by source key, so re-seeded emails are not counted twice.
   if (options.reset) {
     await appDb.withTenant(workspaceId, async (tx) => {
       await tx.delete(schema.reviews);
@@ -139,7 +140,6 @@ export async function seedWorkspace(options: SeedOptions): Promise<SeedResult> {
       await tx.delete(schema.mailboxes);
       await tx.delete(schema.connections);
       await tx.delete(schema.configVersions);
-      await tx.delete(schema.usageEvents).where(eq(schema.usageEvents.metric, "helpdesk.email_processed"));
     });
   }
 
@@ -230,29 +230,25 @@ export async function seedWorkspace(options: SeedOptions): Promise<SeedResult> {
       .from(schema.cannedResponses)
       .limit(1);
     if (!hasCanned) {
-      await tx
-        .insert(schema.cannedResponses)
-        .values(
-          pack.cannedResponses.map((c) => ({
-            workspaceId,
-            title: c.title,
-            body: c.body,
-            teamId: c.team ? (teamId.get(c.team) ?? null) : null,
-          })),
-        );
+      await tx.insert(schema.cannedResponses).values(
+        pack.cannedResponses.map((c) => ({
+          workspaceId,
+          title: c.title,
+          body: c.body,
+          teamId: c.team ? (teamId.get(c.team) ?? null) : null,
+        })),
+      );
     }
     const [hasKb] = await tx.select({ id: schema.kbEntries.id }).from(schema.kbEntries).limit(1);
     if (!hasKb) {
-      await tx
-        .insert(schema.kbEntries)
-        .values(
-          pack.kb.map((k) => ({
-            workspaceId,
-            topic: k.topic,
-            questionVariants: k.questions,
-            answer: k.answer,
-          })),
-        );
+      await tx.insert(schema.kbEntries).values(
+        pack.kb.map((k) => ({
+          workspaceId,
+          topic: k.topic,
+          questionVariants: k.questions,
+          answer: k.answer,
+        })),
+      );
     }
     const [hasReport] = await tx
       .select({ id: schema.insightReports.id })
@@ -382,16 +378,14 @@ async function applyFollowUp(
   if (assigneeId) {
     set.assigneeId = assigneeId;
     set.status = "open";
-    await tx
-      .insert(schema.ticketEvents)
-      .values({
-        workspaceId: input.workspaceId,
-        ticketId,
-        type: "assignee",
-        actorType: "system",
-        data: { to: assigneeId },
-        createdAt: at(5),
-      });
+    await tx.insert(schema.ticketEvents).values({
+      workspaceId: input.workspaceId,
+      ticketId,
+      type: "assignee",
+      actorType: "system",
+      data: { to: assigneeId },
+      createdAt: at(5),
+    });
   }
   if (followUp.note && assigneeId) {
     await tx.insert(schema.ticketMessages).values({
@@ -433,17 +427,15 @@ async function applyFollowUp(
     const statusAt = at((followUp.reply?.afterMinutes ?? 30) + 5);
     if (followUp.status === "resolved") set.resolvedAt = statusAt;
     if (followUp.status === "closed") set.closedAt = statusAt;
-    await tx
-      .insert(schema.ticketEvents)
-      .values({
-        workspaceId: input.workspaceId,
-        ticketId,
-        type: "status",
-        actorType: "user",
-        actorId: assigneeId,
-        data: { to: followUp.status },
-        createdAt: statusAt,
-      });
+    await tx.insert(schema.ticketEvents).values({
+      workspaceId: input.workspaceId,
+      ticketId,
+      type: "status",
+      actorType: "user",
+      actorId: assigneeId,
+      data: { to: followUp.status },
+      createdAt: statusAt,
+    });
   }
   if (Object.keys(set).length > 0) {
     // Only adjust tickets the pipeline left in their initial state (a later email may have reopened them).

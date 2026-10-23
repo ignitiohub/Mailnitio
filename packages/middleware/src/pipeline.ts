@@ -218,7 +218,8 @@ export async function processEmail(deps: PipelineDeps, job: ProcessEmailJob): Pr
         await recordUsage(tx, {
           workspaceId: ws,
           metric: "helpdesk.email_processed",
-          sourceKey: `email:${emailLogId}`,
+          // Keyed by the email's source key so a reprocessed or re-seeded email never counts twice.
+          sourceKey: `email:${key}`,
           occurredAt: receivedAt,
         });
       }
