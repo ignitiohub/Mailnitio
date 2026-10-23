@@ -3,7 +3,6 @@
 Apply to every screen, component and page.
 
 ## Audience & personality
-
 - Users: business administrators, CX/support managers, supervisors, agents, IT and marketing staff at
   enterprises and growing companies. They use the app for hours a day on desktop, and check it on mobile.
 - Personality: professional, premium, calm, trustworthy, precise. Think "enterprise financial software",
@@ -12,30 +11,29 @@ Apply to every screen, component and page.
   drop-shadow-heavy cards, cartoon icons, decorative animation, cramped or cluttered screens.
 
 ## Colour tokens
-
 CSS variables in packages/ui; Tailwind theme maps to them; never hard-code hex in components.
 
 Light theme:
 
-| Token            | Value             | Use                                              |
-| ---------------- | ----------------- | ------------------------------------------------ |
-| --bg             | #F7F8FA           | app background                                   |
-| --surface        | #FFFFFF           | cards, tables, panels                            |
-| --surface-2      | #F1F3F7           | subtle fills, table header, hover rows           |
-| --border         | #E3E6EC           | default borders/dividers                         |
-| --border-strong  | #CDD2DB           | inputs, focused containers                       |
-| --text           | #0E1525           | primary text                                     |
-| --text-muted     | #4A5568           | secondary text (AA on white)                     |
-| --text-subtle    | #6B7385           | captions, placeholders (AA for ≥14px)            |
-| --primary        | #3B3FC4           | brand indigo (buttons, links, active nav)        |
-| --primary-hover  | #3236A8           |                                                  |
-| --primary-soft   | #EEF0FF           | selected rows, active nav background, info chips |
-| --primary-fg     | #FFFFFF           |                                                  |
-| --success / soft | #0F8A5F / #E7F6EF | Processed, Delivered, Resolved                   |
-| --warning / soft | #B7791F / #FDF5E6 | Needs Review, Pending, SLA at risk               |
-| --danger / soft  | #C53030 / #FDECEC | Escalated, Failed, Bounced, SLA breached         |
-| --info / soft    | #2563EB / #EAF1FE | Rerouted, In progress                            |
-| --neutral / soft | #64748B / #F1F5F9 | Shadow, Skipped, Draft                           |
+| Token | Value | Use |
+|---|---|---|
+| --bg | #F7F8FA | app background |
+| --surface | #FFFFFF | cards, tables, panels |
+| --surface-2 | #F1F3F7 | subtle fills, table header, hover rows |
+| --border | #E3E6EC | default borders/dividers |
+| --border-strong | #CDD2DB | inputs, focused containers |
+| --text | #0E1525 | primary text |
+| --text-muted | #4A5568 | secondary text (AA on white) |
+| --text-subtle | #6B7385 | captions, placeholders (AA for ≥14px) |
+| --primary | #3B3FC4 | brand indigo (buttons, links, active nav) |
+| --primary-hover | #3236A8 | |
+| --primary-soft | #EEF0FF | selected rows, active nav background, info chips |
+| --primary-fg | #FFFFFF | |
+| --success / soft | #0F8A5F / #E7F6EF | Processed, Delivered, Resolved |
+| --warning / soft | #B7791F / #FDF5E6 | Needs Review, Pending, SLA at risk |
+| --danger / soft | #C53030 / #FDECEC | Escalated, Failed, Bounced, SLA breached |
+| --info / soft | #2563EB / #EAF1FE | Rerouted, In progress |
+| --neutral / soft | #64748B / #F1F5F9 | Shadow, Skipped, Draft |
 
 Dark theme (same token names): --bg #0B0F19, --surface #121826, --surface-2 #1A2132, --border #252D3F,
 --border-strong #343D52, --text #E8ECF4, --text-muted #A7B0C2, --text-subtle #7F899D,
@@ -47,7 +45,6 @@ Chart palette (ordered, colour-blind-aware): #3B3FC4, #0F8A5F, #B7791F, #2563EB,
 Rule: colour is never the only signal; status always has text (+ icon where useful).
 
 ## Typography
-
 - Font: Inter (variable) for UI and marketing; tabular numerals (font-variant-numeric: tabular-nums) for
   all numbers, KPIs, tables, timestamps. Mono: JetBrains Mono for IDs (MN-1042), API keys, code, headers.
 - Scale (px / line-height / weight):
@@ -57,7 +54,6 @@ Rule: colour is never the only signal; status always has text (+ icon where usef
 - Letter-spacing: -0.02em on Display/H1/H2. Max line length ~72ch for prose.
 
 ## Spacing, layout, shape
-
 - 4px base, 8px grid. Common gaps: 4, 8, 12, 16, 24, 32, 48, 64.
 - Radius: 6px inputs/buttons/chips, 8px cards/panels, 12px modals/drawers, full for avatars/pills.
 - Elevation: borders first; shadows only for overlays (dropdowns, popovers, modals, drawers):
@@ -67,7 +63,6 @@ Rule: colour is never the only signal; status always has text (+ icon where usef
 - Density: comfortable by default (table rows 44px); "compact" toggle (36px) for power users, persisted.
 
 ## Components
-
 shadcn/ui-based, wrapped in packages/ui; one source of truth.
 - Buttons: primary (one per view), secondary (outline), ghost, destructive; sizes sm/md/lg; loading state
   with spinner + disabled; icon-only buttons need a tooltip + aria-label.
@@ -90,7 +85,6 @@ shadcn/ui-based, wrapped in packages/ui; one source of truth.
 - Icons: lucide-react only, 16px in dense UI / 20px in nav, stroke 1.75; consistent metaphors.
 
 ## States (every screen and component must implement)
-
 - Loading: skeletons matching the final layout (no full-page spinners after first load).
 - Empty: icon + one-line explanation + primary next action (e.g. "Connect a mailbox").
 - Error: plain-language message + retry + support reference ID; never raw stack traces.
@@ -98,7 +92,6 @@ shadcn/ui-based, wrapped in packages/ui; one source of truth.
 - Permission: hide actions the role can't perform; if a page is restricted, explain and suggest who to ask.
 
 ## Interactivity & motion
-
 - Hover, focus, active, disabled styles on every interactive element; cursor pointer only on clickables.
 - Visible focus ring: 2px --primary + 2px offset; full keyboard navigation; logical tab order.
 - Keyboard shortcuts (shown in tooltips + "?" help dialog): ⌘/Ctrl+K command palette, / search,
@@ -109,7 +102,6 @@ shadcn/ui-based, wrapped in packages/ui; one source of truth.
 - Inline editing where safe (tags, assignee, status); autosave drafts (reply composer) with "Saved" state.
 
 ## Responsive
-
 Mobile-first CSS, designed desktop-first for power use.
 - Breakpoints: sm 640, md 768, lg 1024, xl 1280, 2xl 1536.
 - ≥ lg: full sidebar + multi-column layouts (e.g. ticket thread + side panel).
@@ -121,13 +113,11 @@ Mobile-first CSS, designed desktop-first for power use.
 - Test at 390px, 768px, 1024px, 1440px.
 
 ## Accessibility (WCAG 2.1 AA minimum)
-
 - Contrast ≥ 4.5:1 text, ≥ 3:1 UI components and large text, in both themes.
 - Semantic HTML, landmarks, labelled form controls, aria-live for toasts/live feeds, alt text, table
   headers with scope, accessible names for icon buttons, focus trapping in modals/drawers.
 
 ## Content & tone
-
 - Clear, concise, professional British/Nigerian business English; sentence case for UI labels and buttons
   ("Assign to me", not "ASSIGN TO ME"); verbs on buttons; no jargon on customer-facing pages.
 - Numbers: thousands separators, currency with code/symbol (₦, $), dates "22 Oct 2026, 14:05" in the
@@ -135,7 +125,6 @@ Mobile-first CSS, designed desktop-first for power use.
 - Error and empty-state copy explains what happened and what to do next.
 
 ## Marketing site specifics
-
 - Premium corporate look: generous whitespace, strong typographic hierarchy (Display/H1), restrained
   colour (white/very light grey sections alternating, indigo accents), real product screenshots/UI
   mockups in subtle device or browser frames, thin dividers, customer-logo strip in greyscale.
@@ -145,13 +134,11 @@ Mobile-first CSS, designed desktop-first for power use.
   with sound. Lighthouse ≥ 90 (performance, accessibility, best practices, SEO).
 
 ## Theming
-
 - Light theme default; dark theme available via user preference (system/light/dark), persisted.
 - Workspace branding (later): logo in the sidebar + acknowledgement templates only; product UI colours
   stay Mailnitio.
 
 ## Design QA checklist (must pass before a screen is "done")
-
 - [ ] Uses only tokens and packages/ui components (no ad-hoc colours, sizes or one-off components)
 - [ ] Loading, empty, error, permission states implemented
 - [ ] Works at 390 / 768 / 1024 / 1440 px with no horizontal page scroll; touch targets ≥ 44px on mobile

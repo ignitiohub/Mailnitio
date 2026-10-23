@@ -52,7 +52,6 @@ The mockups were generated under the retired product name and show "MailCart" br
 name into code or copy; it is always "Mailnitio".
 
 ### Take from the dashboard
-
 - Sidebar grouping with overline labels: Overview, Support AI, Campaigns, Knowledge, Setup, Admin; count
   badges on Inbox log / Needs review; workspace switcher showing environment and shadow state; footer
   with system status and theme toggle.
@@ -63,7 +62,6 @@ name into code or copy; it is always "Mailnitio".
   (mailbox ingestion health, campaign queue, live triage list), then the decision trace.
 
 ### Correct when implementing
-
 - Ticket IDs are `MN-<number>`, not `CAS-…`.
 - Sentence case for labels and chips ("Needs review", "Pending override"); the mockup uses many all-caps
   chips. Overline section labels are the only uppercase text.
