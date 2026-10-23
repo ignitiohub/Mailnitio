@@ -23,3 +23,4 @@ export { cn } from "./lib/cn";
 export * from "./lib/format";
 export { useMediaQuery } from "./lib/use-media-query";
 export * from "./theme/theme";
+export * from "./components/charts";

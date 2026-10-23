@@ -10,6 +10,8 @@ export interface AppNavItem {
   href: string;
   icon: string;
   product?: "helpdesk" | "send";
+  /** Only these workspace roles see the item. */
+  roles?: string[];
 }
 
 export interface AppNavGroup {
@@ -54,17 +56,20 @@ export const appNav: AppNavGroup[] = [
     items: [
       { label: "Users and audit", href: "/app/settings/members", icon: "UserCog" },
       { label: "Usage", href: "/app/usage", icon: "Gauge" },
+      { label: "Email simulator", href: "/app/simulator", icon: "FlaskConical", product: "helpdesk", roles: ["owner", "admin"] },
       { label: "Settings", href: "/app/settings", icon: "Settings" },
     ],
   },
 ];
 
-export function navForInterest(interest: ProductInterest | null): AppNavGroup[] {
+export function navForInterest(interest: ProductInterest | null, role?: string): AppNavGroup[] {
   return appNav
     .map((group) => ({
       ...group,
       items: group.items.filter(
-        (item) => !item.product || !interest || interest === "both" || item.product === interest,
+        (item) =>
+          (!item.product || !interest || interest === "both" || item.product === interest) &&
+          (!item.roles || (role !== undefined && item.roles.includes(role))),
       ),
     }))
     .filter((group) => group.items.length > 0);

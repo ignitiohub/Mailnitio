@@ -69,6 +69,8 @@ export interface DataTableProps<T> {
   onRowClick?: (row: T) => void;
   /** Row ids to highlight briefly (new rows from live updates). */
   highlightIds?: ReadonlySet<string>;
+  /** Row focused with keyboard navigation (j/k): outlined and scrolled into view. */
+  activeRowId?: string | null;
   caption: string;
 }
 
@@ -86,6 +88,7 @@ export function DataTable<T>({
   filters,
   onRowClick,
   highlightIds,
+  activeRowId,
   caption,
 }: DataTableProps<T>) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -281,12 +284,15 @@ export function DataTable<T>({
                         <tr
                           key={row.id}
                           data-state={row.getIsSelected() ? "selected" : undefined}
+                          aria-current={activeRowId === row.id ? "true" : undefined}
+                          ref={activeRowId === row.id ? (el) => el?.scrollIntoView({ block: "nearest" }) : undefined}
                           onClick={onRowClick ? () => onRowClick(row.original) : undefined}
                           className={cn(
                             "h-[var(--row-height)] border-b border-border transition-colors duration-150 last:border-0 hover:bg-surface-2",
                             "data-[state=selected]:bg-primary-soft",
                             onRowClick && "cursor-pointer",
                             highlightIds?.has(row.id) && "animate-row-highlight",
+                            activeRowId === row.id && "bg-surface-2 outline-2 -outline-offset-2 outline-primary",
                           )}
                         >
                           {row.getVisibleCells().map((cell) => {

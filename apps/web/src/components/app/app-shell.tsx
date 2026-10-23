@@ -17,17 +17,19 @@ import {
   Tooltip,
 } from "@mailnitio/ui";
 import {
-  Bell,
   ChartColumn,
   Contact,
+  FlaskConical,
   Gauge,
   Inbox,
+  Keyboard,
   LayoutDashboard,
   ListChecks,
   LogOut,
   type LucideIcon,
   Mail,
   ScrollText,
+  Search,
   Send,
   Settings,
   ShieldCheck,
@@ -37,10 +39,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { type ReactNode, useCallback, useState } from "react";
+import { LookupsProvider } from "@/components/helpdesk/lookups";
 import { Logo, LogoMark } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
 import { useMe } from "@/lib/me";
+import { useApi } from "@/lib/use-api";
+import { CommandPalette, SearchButton } from "./command-palette";
+import { NotificationsMenu } from "./notifications-menu";
+import { ShortcutsHelp, useGlobalShortcuts } from "./shortcuts";
+import { WorkspaceSwitcher } from "./workspace-switcher";
 
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
@@ -56,6 +64,7 @@ const ICONS: Record<string, LucideIcon> = {
   UserCog,
   Gauge,
   Settings,
+  FlaskConical,
 };
 
 const NextShellLink: ShellLink = ({ href, children, ...props }) => (
@@ -76,19 +85,26 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { me } = useMe();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const openSearch = useCallback(() => setSearchOpen(true), []);
+  const { helpOpen, setHelpOpen } = useGlobalShortcuts(openSearch);
+  const helpdesk = me.workspace.productInterest !== "send";
+  // Badge counts for the sidebar (polled; cheap aggregate).
+  const counts = useApi<{ data: Record<string, number> }>(helpdesk ? "/v1/tickets/counts" : null, { pollMs: 30_000 });
+  const reviewCount = counts.data?.data.needs_review;
 
-  const groups: ShellNavGroup[] = navForInterest(me.workspace.productInterest).map((group) => ({
+  const groups: ShellNavGroup[] = navForInterest(me.workspace.productInterest, me.role).map((group) => ({
     label: group.label,
     items: group.items.map((item) => ({
       label: item.label,
       href: item.href,
       icon: ICONS[item.icon] ?? Inbox,
+      badge: item.href === "/app/review" && reviewCount ? String(reviewCount) : undefined,
     })),
   }));
 
-  const interest = me.workspace.productInterest;
   const bottomTabs =
-    interest === "send"
+    me.workspace.productInterest === "send"
       ? [
           { label: "Dashboard", href: "/app", icon: LayoutDashboard },
           { label: "Campaigns", href: "/app/campaigns", icon: Send },
@@ -106,89 +122,80 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <SidebarLayout
-      brand={<Logo />}
-      brandMark={<LogoMark />}
-      groups={groups}
-      pathname={pathname}
-      Link={NextShellLink}
-      exactRoots={["/app", "/app/settings"]}
-      bottomTabs={bottomTabs}
-      workspaceSwitcher={
-        <div className="flex flex-col gap-0.5 rounded-card border border-border bg-surface-2 px-3 py-2">
-          <span className="text-overline text-text-subtle uppercase">Workspace</span>
-          <span className="truncate text-body font-medium text-text">{me.workspace.name}</span>
-        </div>
-      }
-      sidebarFooter={
-        <p className="flex items-center gap-2 text-caption text-text-muted">
-          <span aria-hidden className="size-2 rounded-full bg-success" />
-          All systems operational
-        </p>
-      }
-      topBar={
-        <>
-          <DropdownMenu>
-            <Tooltip content="Alerts">
+    <LookupsProvider>
+      <SidebarLayout
+        brand={<Logo />}
+        brandMark={<LogoMark />}
+        groups={groups}
+        pathname={pathname}
+        Link={NextShellLink}
+        exactRoots={["/app", "/app/settings"]}
+        bottomTabs={bottomTabs}
+        workspaceSwitcher={<WorkspaceSwitcher />}
+        sidebarFooter={
+          <p className="flex items-center gap-2 text-caption text-text-muted">
+            <span aria-hidden className="size-2 rounded-full bg-success" />
+            All systems operational
+          </p>
+        }
+        topBar={
+          <>
+            <SearchButton onClick={openSearch} />
+            <Tooltip content="Search" shortcut="/">
+              <Button variant="ghost" size="icon" aria-label="Search" className="max-md:size-11 lg:hidden" onClick={openSearch}>
+                <Search aria-hidden />
+              </Button>
+            </Tooltip>
+            <NotificationsMenu />
+            <ThemeSwitcher />
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Alerts, none" className="max-md:size-11">
-                  <Bell aria-hidden />
+                <Button variant="ghost" className="gap-2 px-1.5 max-md:size-11" aria-label={`Account menu for ${me.user.name}`}>
+                  <span className="flex size-7 items-center justify-center rounded-full bg-primary-soft text-caption text-primary">
+                    {initials(me.user.name)}
+                  </span>
+                  <span className="hidden flex-col items-start text-left leading-tight lg:flex">
+                    <span className="text-small font-medium text-text">{me.user.name}</span>
+                    <span className="text-caption font-normal text-text-subtle">{ROLE_LABELS[me.role]}</span>
+                  </span>
                 </Button>
               </DropdownMenuTrigger>
-            </Tooltip>
-            <DropdownMenuContent align="end" className="w-72">
-              <DropdownMenuLabel>Alerts</DropdownMenuLabel>
-              <p className="px-2 pb-2 text-body text-text-muted">
-                No alerts. Mailbox and SLA alerts will appear here.
-              </p>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <ThemeSwitcher />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="gap-2 px-1.5 max-md:size-11"
-                aria-label={`Account menu for ${me.user.name}`}
-              >
-                <span className="flex size-7 items-center justify-center rounded-full bg-primary-soft text-caption text-primary">
-                  {initials(me.user.name)}
-                </span>
-                <span className="hidden flex-col items-start text-left leading-tight lg:flex">
-                  <span className="text-small font-medium text-text">{me.user.name}</span>
-                  <span className="text-caption font-normal text-text-subtle">{ROLE_LABELS[me.role]}</span>
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60">
-              <DropdownMenuLabel className="flex flex-col">
-                <span className="text-body font-medium text-text">{me.user.name}</span>
-                <span className="truncate text-caption font-normal">{me.user.email}</span>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/app/settings/security">
-                  <ShieldCheck aria-hidden />
-                  Security
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/app/settings">
-                  <Settings aria-hidden />
-                  Workspace settings
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => void signOut()}>
-                <LogOut aria-hidden />
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
-      }
-    >
-      {children}
-    </SidebarLayout>
+              <DropdownMenuContent align="end" className="w-60">
+                <DropdownMenuLabel className="flex flex-col">
+                  <span className="text-body font-medium text-text">{me.user.name}</span>
+                  <span className="truncate text-caption font-normal">{me.user.email}</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/app/settings/security">
+                    <ShieldCheck aria-hidden />
+                    Security
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/app/settings">
+                    <Settings aria-hidden />
+                    Workspace settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setHelpOpen(true)}>
+                  <Keyboard aria-hidden />
+                  Keyboard shortcuts
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => void signOut()}>
+                  <LogOut aria-hidden />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        }
+      >
+        {children}
+      </SidebarLayout>
+      <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
+      <ShortcutsHelp open={helpOpen} onOpenChange={setHelpOpen} />
+    </LookupsProvider>
   );
 }

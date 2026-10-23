@@ -42,6 +42,18 @@
   --chart-7: #c53030;
   --chart-8: #64748b;
 
+  /*
+   * Categorical series for multi-series charts: the subset of the chart palette that passes the
+   * colour-blind validator in fixed order (blue and violet are indistinguishable for deuteranopes, teal
+   * reads grey). Max 5 hues; a 6th series is "Other" in slate. See docs/decisions.md.
+   */
+  --series-1: #3b3fc4;
+  --series-2: #0f8a5f;
+  --series-3: #b7791f;
+  --series-4: #2563eb;
+  --series-5: #c53030;
+  --series-other: #64748b;
+
   --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06);
   --shadow-md: 0 4px 12px rgb(16 24 40 / 0.08);
   --shadow-lg: 0 12px 32px rgb(16 24 40 / 0.12);
@@ -89,6 +101,13 @@
   --chart-7: #f07171;
   --chart-8: #94a3b8;
 
+  --series-1: #6e72e8;
+  --series-2: #2aa97b;
+  --series-3: #bc8b2f;
+  --series-4: #588cee;
+  --series-5: #e06464;
+  --series-other: #7f899d;
+
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.45);
   --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.5);
@@ -124,6 +143,12 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --color-chart-6: var(--chart-6);
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-series-3: var(--series-3);
+  --color-series-4: var(--series-4);
+  --color-series-5: var(--series-5);
+  --color-series-other: var(--series-other);
 
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
