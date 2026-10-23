@@ -186,3 +186,16 @@ export class ProcessingError extends Error {
     this.name = "ProcessingError";
   }
 }
+
+/** The single pipeline entry point: Graph webhooks (D3), the simulator and replays all enqueue here. */
+export const PROCESS_EMAIL_QUEUE = "process-email";
+export const PROCESS_EMAIL_DLQ = "process-email-dlq";
+
+/** Queue options for process-email (spec §7.1); used by whoever creates the queue first. */
+export const PROCESS_EMAIL_QUEUE_OPTIONS = {
+  retryLimit: 8,
+  retryDelay: 15,
+  retryBackoff: true,
+  expireInSeconds: 900,
+  deadLetter: PROCESS_EMAIL_DLQ,
+} as const;

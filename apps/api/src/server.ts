@@ -1,11 +1,12 @@
 import { createAuth } from "@mailnitio/auth";
 import { createEnvelope } from "@mailnitio/crypto";
 import { createDatabase } from "@mailnitio/db";
+import { PROCESS_EMAIL_QUEUE, PROCESS_EMAIL_QUEUE_OPTIONS } from "@mailnitio/middleware";
 import { createLogger, initSentry } from "@mailnitio/observability";
 import { buildApp } from "./app";
 import { loadEnv } from "./env";
 import { createJobQueue } from "./queue";
-import { LEAD_NOTIFY_QUEUE } from "./routes/leads";
+import { LEAD_NOTIFY_QUEUE, LEAD_NOTIFY_QUEUE_OPTIONS } from "./routes/leads";
 import { createTurnstileVerifier } from "./turnstile";
 
 const env = loadEnv();
@@ -25,7 +26,10 @@ const auth = createAuth({
   secret: env.BETTER_AUTH_SECRET,
   trustedOrigins: [env.WEB_ORIGIN],
 });
-const queue = await createJobQueue(env.DATABASE_URL, [LEAD_NOTIFY_QUEUE]);
+const queue = await createJobQueue(env.DATABASE_URL, [
+  { name: LEAD_NOTIFY_QUEUE, options: LEAD_NOTIFY_QUEUE_OPTIONS },
+  { name: PROCESS_EMAIL_QUEUE, options: PROCESS_EMAIL_QUEUE_OPTIONS },
+]);
 
 const app = await buildApp({
   logger,

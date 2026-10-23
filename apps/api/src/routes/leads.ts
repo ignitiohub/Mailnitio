@@ -6,6 +6,7 @@ import type { JobQueue } from "../queue";
 import type { CaptchaVerifier } from "../turnstile";
 
 export const LEAD_NOTIFY_QUEUE = "leads.notify";
+export const LEAD_NOTIFY_QUEUE_OPTIONS = { retryLimit: 5, retryBackoff: true } as const;
 
 /**
  * POST /v1/leads: book-a-demo. Write-first: the lead is stored before any notification is attempted;

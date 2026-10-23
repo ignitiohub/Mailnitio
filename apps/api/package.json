@@ -18,6 +18,8 @@
     "@mailnitio/core": "workspace:*",
     "@mailnitio/crypto": "workspace:*",
     "@mailnitio/db": "workspace:*",
+    "@mailnitio/helpdesk": "workspace:*",
+    "@mailnitio/middleware": "workspace:*",
     "@mailnitio/observability": "workspace:*",
     "@mailnitio/shared": "workspace:*",
     "@sentry/node": "^11.8.0",

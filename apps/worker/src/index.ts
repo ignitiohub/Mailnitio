@@ -1,5 +1,14 @@
 import { createSystemMailer } from "@mailnitio/core";
 import { and, createDatabase, isNull, lt, schema } from "@mailnitio/db";
+import { HelpdeskDestination, SimulatedAcknowledger } from "@mailnitio/helpdesk";
+import {
+  PROCESS_EMAIL_DLQ,
+  PROCESS_EMAIL_QUEUE,
+  PROCESS_EMAIL_QUEUE_OPTIONS,
+  type ProcessEmailJob,
+  processEmail,
+  StubAgents,
+} from "@mailnitio/middleware";
 import { createLogger, initSentry } from "@mailnitio/observability";
 import * as Sentry from "@sentry/node";
 import { PgBoss } from "pg-boss";
@@ -42,9 +51,45 @@ boss.on("error", (error) => {
 });
 
 await boss.start();
-for (const name of [LEAD_NOTIFY_QUEUE, LEAD_SWEEP_QUEUE, HEARTBEAT_QUEUE]) {
+await boss.createQueue(LEAD_NOTIFY_QUEUE, { retryLimit: 5, retryBackoff: true });
+for (const name of [LEAD_SWEEP_QUEUE, HEARTBEAT_QUEUE, PROCESS_EMAIL_DLQ]) {
   await boss.createQueue(name);
 }
+// Middleware spec §7.1: 8 retries with backoff, 15-minute expiry, dead-letter queue for replay.
+await boss.createQueue(PROCESS_EMAIL_QUEUE, PROCESS_EMAIL_QUEUE_OPTIONS);
+
+// D2: the stub agents apply precomputed decisions; D3 swaps in the LLM gateway here.
+const agents = new StubAgents();
+const acknowledger = new SimulatedAcknowledger();
+await boss.work<ProcessEmailJob>(PROCESS_EMAIL_QUEUE, { pollingIntervalSeconds: 1 }, async (jobs) => {
+  for (const job of jobs) {
+    const { workspaceId, message, source } = job.data;
+    try {
+      const result = await processEmail(
+        { db, agents, destination: new HelpdeskDestination(workspaceId), acknowledger },
+        job.data,
+      );
+      logger.info(
+        {
+          workspaceId,
+          source,
+          emailLogId: result.emailLogId,
+          status: result.status,
+          action: result.action,
+          ticketKey: result.ticketKey,
+        },
+        "email processed",
+      );
+    } catch (error) {
+      logger.error(
+        { err: error, workspaceId, internetMessageId: message.internetMessageId },
+        "email processing failed; will retry",
+      );
+      Sentry.captureException(error, { tags: { job: PROCESS_EMAIL_QUEUE } });
+      throw error;
+    }
+  }
+});
 
 await boss.work<{ leadId: string }>(LEAD_NOTIFY_QUEUE, async (jobs) => {
   for (const job of jobs) {
@@ -72,11 +117,7 @@ await boss.work(LEAD_SWEEP_QUEUE, async () => {
       .limit(100),
   );
   for (const lead of pending) {
-    await boss.send(
-      LEAD_NOTIFY_QUEUE,
-      { leadId: lead.id },
-      { singletonKey: lead.id, retryLimit: 5, retryBackoff: true },
-    );
+    await boss.send(LEAD_NOTIFY_QUEUE, { leadId: lead.id }, { singletonKey: lead.id });
   }
   if (pending.length > 0) logger.info({ count: pending.length }, "re-enqueued pending lead notifications");
 });

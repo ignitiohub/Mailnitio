@@ -50,6 +50,12 @@ importers:
       '@mailnitio/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@mailnitio/helpdesk':
+        specifier: workspace:*
+        version: link:../../packages/helpdesk
+      '@mailnitio/middleware':
+        specifier: workspace:*
+        version: link:../../packages/middleware
       '@mailnitio/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -151,12 +157,21 @@ importers:
 
   apps/worker:
     dependencies:
+      '@mailnitio/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@mailnitio/core':
         specifier: workspace:*
         version: link:../../packages/core
       '@mailnitio/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@mailnitio/helpdesk':
+        specifier: workspace:*
+        version: link:../../packages/helpdesk
+      '@mailnitio/middleware':
+        specifier: workspace:*
+        version: link:../../packages/middleware
       '@mailnitio/observability':
         specifier: workspace:*
         version: link:../../packages/observability
