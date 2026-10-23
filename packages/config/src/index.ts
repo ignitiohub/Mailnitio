@@ -4,3 +4,4 @@ export * from "./lead-options";
 export * from "./navigation";
 export * from "./pricing";
 export * from "./site";
+export * from "./tenant-config";

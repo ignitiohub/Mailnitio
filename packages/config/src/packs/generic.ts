@@ -1,0 +1,231 @@
+import type { IndustryPack } from "./types";
+
+export const genericPack: IndustryPack = {
+  id: "generic",
+  name: "Generic",
+  workspaceName: "Acme Services",
+  domain: "acmeservices.example",
+  config: {
+    displayName: "Acme Services",
+    industry: "Services",
+    defaultCategory: "enquiry",
+    categories: [
+      {
+        key: "complaint",
+        label: "Complaint",
+        description: "The customer is unhappy and wants something put right.",
+        include: ["unacceptable", "poor service", "disappointed", "still waiting"],
+        exclude: [],
+        team: "complaints",
+        defaultPriority: "high",
+      },
+      {
+        key: "enquiry",
+        label: "Enquiry",
+        description: "A general question about products, prices or processes.",
+        include: ["how do I", "what is", "price", "can I"],
+        exclude: [],
+        team: "enquiries",
+        defaultPriority: "medium",
+      },
+      {
+        key: "service_request",
+        label: "Service request",
+        description: "A request for the company to do something: book, change, cancel or deliver.",
+        include: ["please book", "cancel", "reschedule", "change my order"],
+        exclude: [],
+        team: "service_requests",
+        defaultPriority: "medium",
+      },
+      {
+        key: "feedback",
+        label: "Feedback",
+        description: "Compliments or suggestions with no request to act on.",
+        include: ["feedback", "suggestion", "great service"],
+        exclude: [],
+        team: "enquiries",
+        defaultPriority: "low",
+      },
+      {
+        key: "spam",
+        label: "Spam",
+        description: "Unsolicited promotional or suspicious email.",
+        include: ["guaranteed returns", "click to register"],
+        exclude: [],
+        team: "enquiries",
+        defaultPriority: "low",
+      },
+    ],
+    thresholds: { high: 0.85, low: 0.6, spam: 0.9, context: 0.7 },
+    escalation: { terms: ["regulator", "lawyer", "court", "media"], team: "escalations" },
+    threading: {
+      ticketPattern: "MN-\\d+",
+      reopenDays: 14,
+      closurePhrases: ["that is resolved", "all sorted", "issue resolved", "you can close this"],
+    },
+    ack: {
+      enabled: true,
+      businessHours: "We reply to most emails within one working day.",
+      signature: "Customer Support\nAcme Services",
+      templates: {
+        default: {
+          subject: "RE: {{subject}} [{{ticket_number}}]",
+          body: "Dear {{customer_first_name}},\n\nWe have received your email and opened {{ticket_number}} with our {{team_name}} team.\n\n{{business_hours}}\n\n{{signature}}",
+        },
+      },
+    },
+    pii: { customPatterns: [] },
+    thirdPartyDomains: [],
+  },
+  teams: [
+    { key: "complaints", name: "Complaints", emailAlias: "complaints@acmeservices.example" },
+    { key: "enquiries", name: "Enquiries", emailAlias: "hello@acmeservices.example" },
+    { key: "service_requests", name: "Service Requests", emailAlias: "service@acmeservices.example" },
+    { key: "escalations", name: "Escalations", emailAlias: "escalations@acmeservices.example" },
+  ],
+  mailboxes: [
+    {
+      address: "hello@acmeservices.example",
+      displayName: "Hello",
+      defaultCategory: "enquiry",
+      mode: "live",
+      ackEnabled: true,
+    },
+    {
+      address: "complaints@acmeservices.example",
+      displayName: "Complaints",
+      defaultCategory: "complaint",
+      mode: "shadow",
+      ackEnabled: false,
+    },
+  ],
+  agents: [
+    {
+      name: "Folake Balogun",
+      email: "folake.balogun@acmeservices.example",
+      role: "supervisor",
+      teams: ["complaints", "escalations"],
+    },
+    {
+      name: "Obinna Chukwu",
+      email: "obinna.chukwu@acmeservices.example",
+      role: "agent",
+      teams: ["enquiries", "service_requests"],
+    },
+  ],
+  cannedResponses: [
+    {
+      title: "Thanks for your feedback",
+      body: "Dear {{customer_first_name}},\n\nThank you for your feedback. We have shared it with the team.\n\nRegards,\n{{agent_name}}",
+    },
+    {
+      title: "Booking confirmed",
+      team: "service_requests",
+      body: "Dear {{customer_first_name}},\n\nYour booking is confirmed.\n\nRegards,\n{{agent_name}}",
+    },
+  ],
+  kb: [
+    {
+      topic: "Opening hours",
+      questions: ["What are your opening hours?"],
+      answer: "We are open Monday to Saturday, 8am to 6pm.",
+    },
+    {
+      topic: "Refunds",
+      questions: ["How do refunds work?"],
+      answer: "Refunds are processed within 5 working days to the original payment method.",
+    },
+    {
+      topic: "Rescheduling",
+      questions: ["Can I reschedule?"],
+      answer: "Reply with your preferred date and we will confirm availability.",
+    },
+    {
+      topic: "Prices",
+      questions: ["How much does it cost?"],
+      answer: "Our current price list is on the website under Pricing.",
+    },
+    {
+      topic: "Contact",
+      questions: ["How do I reach you?"],
+      answer: "Email hello@acmeservices.example or call our support line.",
+    },
+  ],
+  templates: [
+    {
+      category: "complaint",
+      weight: 22,
+      subjects: ["Very disappointed", "Still waiting for my order", "Poor service"],
+      bodies: [
+        "I ordered {days} days ago and I am still waiting. This is unacceptable.",
+        "Your technician did not show up and nobody called me.",
+      ],
+      summaries: ["Order delayed by {days} days", "Technician missed appointment"],
+      reasons: ["Customer expresses dissatisfaction"],
+      replies: ["Dear {name},\n\nI am sorry about this. Your order has been dispatched today.\n\nRegards"],
+    },
+    {
+      category: "enquiry",
+      weight: 30,
+      subjects: ["Question about prices", "Opening hours", "How do I pay?"],
+      bodies: ["What are your prices for a standard service in {area}?", "Are you open on Saturdays?"],
+      summaries: ["Asks about prices in {area}", "Asks about opening hours"],
+      reasons: ["General question"],
+      replies: [
+        "Dear {name},\n\nOur price list is on the website and we are open on Saturdays from 8am.\n\nRegards",
+      ],
+    },
+    {
+      category: "service_request",
+      weight: 30,
+      subjects: ["Please reschedule my booking", "Cancel my order", "Book a service"],
+      bodies: [
+        "Please move my booking to next {month}.",
+        "Kindly cancel order {ref}.",
+        "I would like to book a service for my home in {area}.",
+      ],
+      summaries: ["Reschedule booking", "Cancel order {ref}", "Book a service in {area}"],
+      reasons: ["Customer asks the company to take an action"],
+      replies: ["Dear {name},\n\nDone. Your booking has been updated.\n\nRegards"],
+    },
+    {
+      category: "feedback",
+      weight: 10,
+      subjects: ["Great service", "A suggestion"],
+      bodies: ["Thank you for the great service last week.", "It would help if you sent reminders by SMS."],
+      summaries: ["Positive feedback", "Suggests SMS reminders"],
+      reasons: ["Feedback with no request"],
+      replies: ["Dear {name},\n\nThank you for your feedback.\n\nRegards"],
+    },
+  ],
+  escalationEmails: [
+    {
+      subject: "I am going to the media",
+      body: "If this is not fixed today I will go to the media and contact my lawyer.",
+      reason: "Threatens media and legal action",
+    },
+  ],
+  followUpLines: {
+    continuation: ["Any update please?", "Still waiting."],
+    closure: ["All sorted, thank you.", "Issue resolved, you can close this."],
+    newIssue: [{ line: "Also, please reschedule my next booking.", category: "service_request" }],
+  },
+  insightReport: {
+    title: "Insight report: Acme Services",
+    period: "Sample of 1,200 anonymised emails, July to September 2026",
+    emailsAnalysed: 1200,
+    misroutedShare: 0.15,
+    duplicateShare: 0.12,
+    autoAnswerShare: 0.26,
+    topics: [
+      { label: "Service request", share: 0.34, volume: 408, misrouted: 0.1, autoAnswerCandidate: false },
+      { label: "Enquiry", share: 0.31, volume: 372, misrouted: 0.09, autoAnswerCandidate: true },
+      { label: "Complaint", share: 0.24, volume: 288, misrouted: 0.27, autoAnswerCandidate: false },
+      { label: "Feedback", share: 0.11, volume: 132, misrouted: 0.2, autoAnswerCandidate: false },
+    ],
+    findings: [
+      "A quarter of emails are standard questions the knowledge base can answer.",
+      "Complaints sent to hello@ wait a day longer for a first response.",
+    ],
+  },
+};
