@@ -1,0 +1,27 @@
+{
+  "name": "@mailnitio/helpdesk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@mailnitio/config": "workspace:*",
+    "@mailnitio/core": "workspace:*",
+    "@mailnitio/db": "workspace:*",
+    "@mailnitio/middleware": "workspace:*",
+    "@mailnitio/shared": "workspace:*",
+    "drizzle-orm": "^0.45.4",
+    "@mailnitio/crypto": "workspace:*"
+  },
+  "devDependencies": {
+    "embedded-postgres": "18.4.0-beta.17",
+    "pg": "^8.23.1",
+    "@types/pg": "^8.23.1"
+  }
+}
