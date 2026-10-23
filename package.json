@@ -17,11 +17,11 @@
     "db:local": "pnpm --filter @mailnitio/db local"
   },
   "devDependencies": {
-    "@biomejs/biome": "latest",
+    "@biomejs/biome": "^2.6.2",
     "@types/node": "^22",
-    "turbo": "latest",
+    "turbo": "^2.11.10",
     "typescript": "~5.9",
-    "tsx": "latest",
-    "vitest": "latest"
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.5"
   }
 }

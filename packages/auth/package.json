@@ -15,8 +15,8 @@
     "@mailnitio/shared": "workspace:*",
     "@mailnitio/core": "workspace:*",
     "@mailnitio/observability": "workspace:*",
-    "better-auth": "latest",
-    "drizzle-orm": "latest",
+    "better-auth": "^1.7.12",
+    "drizzle-orm": "^0.45.4",
     "@mailnitio/crypto": "workspace:*"
   },
   "devDependencies": {}

@@ -16,12 +16,12 @@
   },
   "dependencies": {
     "@mailnitio/shared": "workspace:*",
-    "drizzle-orm": "latest",
-    "pg": "latest"
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
-    "@types/pg": "latest",
-    "drizzle-kit": "latest",
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "^0.31.11",
     "embedded-postgres": "18.4.0-beta.17"
   }
 }

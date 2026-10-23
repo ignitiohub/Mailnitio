@@ -15,8 +15,8 @@
     "@mailnitio/shared": "workspace:*",
     "@mailnitio/crypto": "workspace:*",
     "@mailnitio/observability": "workspace:*",
-    "drizzle-orm": "latest",
-    "resend": "latest"
+    "drizzle-orm": "^0.45.4",
+    "resend": "^6.34.1"
   },
   "devDependencies": {}
 }

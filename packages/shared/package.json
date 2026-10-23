@@ -11,7 +11,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "zod": "latest",
+    "zod": "^4.6.7",
     "@mailnitio/config": "workspace:*"
   },
   "devDependencies": {}

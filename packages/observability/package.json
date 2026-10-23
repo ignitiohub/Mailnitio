@@ -11,9 +11,9 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "pino": "latest",
-    "pino-pretty": "latest",
-    "@sentry/node": "latest"
+    "pino": "^10.4.0",
+    "pino-pretty": "^13.2.0",
+    "@sentry/node": "^11.8.0"
   },
   "devDependencies": {}
 }
