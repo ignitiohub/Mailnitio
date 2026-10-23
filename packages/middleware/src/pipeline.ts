@@ -63,6 +63,7 @@ async function recordAgentRun<T>(
   emailLogId: string,
   agentType: string,
   result: AgentResult<T>,
+  at: Date,
 ) {
   await tx.insert(schema.agentRuns).values({
     workspaceId,
@@ -78,6 +79,7 @@ async function recordAgentRun<T>(
     inputTokens: result.meta.inputTokens,
     outputTokens: result.meta.outputTokens,
     costUsd: result.meta.costUsd,
+    createdAt: at,
   });
 }
 
@@ -103,10 +105,15 @@ export async function processEmail(deps: PipelineDeps, job: ProcessEmailJob): Pr
         status: schema.emailLog.status,
         action: schema.emailLog.action,
         ticketKey: schema.emailLog.ticketKey,
+        errorClass: schema.emailLog.errorClass,
       })
       .from(schema.emailLog)
       .where(and(eq(schema.emailLog.workspaceId, ws), eq(schema.emailLog.sourceKey, key)));
     if (existing && DONE_STATUSES.has(existing.status)) return { kind: "done", done: existing } as const;
+    // Permanent and config failures run again only on an explicit replay; transient ones retry.
+    if (existing?.status === "failed" && existing.errorClass !== "transient" && job.source !== "replay") {
+      return { kind: "done", done: existing } as const;
+    }
     let emailLogId = existing?.id;
     if (existing) {
       await tx
@@ -212,6 +219,7 @@ export async function processEmail(deps: PipelineDeps, job: ProcessEmailJob): Pr
           workspaceId: ws,
           metric: "helpdesk.email_processed",
           sourceKey: `email:${emailLogId}`,
+          occurredAt: receivedAt,
         });
       }
       return { emailLogId, alreadyProcessed: false, ...result };
@@ -379,7 +387,7 @@ export async function processEmail(deps: PipelineDeps, job: ProcessEmailJob): Pr
         },
         job,
       });
-      await recordAgentRun(tx, ws, emailLogId, "context", result);
+      await recordAgentRun(tx, ws, emailLogId, "context", result, clock(1));
       context = result.ok ? result.output : null;
       contextFailed = !result.ok;
     }
@@ -445,7 +453,7 @@ export async function processEmail(deps: PipelineDeps, job: ProcessEmailJob): Pr
         fromDomain: msg.from.split("@")[1] ?? "",
         job,
       });
-      await recordAgentRun(tx, ws, emailLogId, "classifier", result);
+      await recordAgentRun(tx, ws, emailLogId, "classifier", result, clock(1.5));
       classification = result.ok ? result.output : null;
       classifierFailed = !result.ok;
     }
@@ -577,6 +585,7 @@ export async function processEmail(deps: PipelineDeps, job: ProcessEmailJob): Pr
           normalizedSubject: normalizeSubject(msg.subject, config.threading.ticketPattern),
           category: decision?.category ?? null,
           lastMessageAt: receivedAt,
+          createdAt: receivedAt,
         })
         .onConflictDoUpdate({
           target: [schema.emailThreads.workspaceId, schema.emailThreads.conversationId],

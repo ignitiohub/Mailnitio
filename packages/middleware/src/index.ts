@@ -4,4 +4,5 @@ export * from "./pii";
 export * from "./pipeline";
 export * from "./prefilter";
 export * from "./router";
+export * from "./stub-agents";
 export * from "./thread";
