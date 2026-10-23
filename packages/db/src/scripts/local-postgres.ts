@@ -17,6 +17,8 @@ const pg = new EmbeddedPostgres({
   password: "mailnitio_owner_dev",
   port: 54329,
   persistent: true,
+  // UTF-8 like Neon; on Windows initdb would otherwise use the system code page.
+  initdbFlags: ["--encoding=UTF8", "--locale=C"],
 });
 
 if (fresh) await pg.initialise();

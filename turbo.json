@@ -12,7 +12,8 @@
       "dependsOn": ["^typecheck"]
     },
     "test": {
-      "outputs": []
+      "outputs": [],
+      "dependsOn": ["^test"]
     },
     "dev": {
       "cache": false,
