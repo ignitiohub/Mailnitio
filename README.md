@@ -67,6 +67,22 @@ pnpm db:migrate               # applies migrations and sets the runtime role pas
 pnpm dev                      # web on :3400, API on :3401, worker
 ```
 
+### Demo data
+
+Load an industry pack into a demo workspace (idempotent; `--reset` wipes and reloads that workspace's
+helpdesk data, about 25 s for 500 emails):
+
+```bash
+# sign up in the app first, then:
+pnpm mailnitio seed --pack financial-services --workspace "Acme Asset Management" --owner you@example.com
+# later runs on the same workspace can drop --owner
+pnpm mailnitio seed --pack financial-services --workspace "Acme Asset Management" --reset
+```
+
+Packs: `financial-services`, `utilities`, `generic`. `--owner` is the email of an existing user and is
+required when the workspace does not exist yet. Owners and admins can send more test emails from
+**Email simulator** in the portal; the worker must be running to process them.
+
 Without `RESEND_API_KEY`, system emails (verification links, password resets) are printed to the API log.
 Without Turnstile keys, the demo form skips the captcha check.
 
