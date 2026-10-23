@@ -225,6 +225,89 @@ describe("pipeline", () => {
   });
 });
 
+describe("mixed reply (demo story step 4)", () => {
+  it("appends the thanks to the ticket and opens a new linked ticket for the new issue", async () => {
+    const [mailbox] = await app.withTenant(wsA, (tx) =>
+      tx.select().from(schema.mailboxes).where(eq(schema.mailboxes.address, "enquiries@acmeasset.ng")),
+    );
+    if (!mailbox) throw new Error("mailbox missing");
+    const deps = {
+      db: app,
+      agents: new StubAgents(),
+      destination: new HelpdeskDestination(wsA),
+      acknowledger: new SimulatedAcknowledger(),
+    };
+    const base = {
+      workspaceId: wsA,
+      mailboxId: mailbox.id,
+      source: "simulator" as const,
+      message: {
+        internetMessageId: "<mixed-1@test>",
+        from: "kunle.lawal@example.com",
+        fromName: "Kunle Lawal",
+        to: [mailbox.address],
+        cc: [],
+        subject: "Minimum investment for the Balanced Fund",
+        body: "What is the minimum investment for the Balanced Fund?",
+        receivedAt: new Date().toISOString(),
+        headers: {},
+      },
+    };
+    const original = await processEmail(deps, base);
+    const mixed = await processEmail(deps, {
+      ...base,
+      message: {
+        ...base.message,
+        internetMessageId: "<mixed-2@test>",
+        subject: `RE: Minimum investment for the Balanced Fund [${original.ticketKey}]`,
+        body: "Thanks, also my statement is wrong.",
+      },
+      precomputed: {
+        context: {
+          decision: "mixed",
+          replyType: "mixed",
+          confidence: 0.9,
+          reason: "Thanks the team and raises a separate issue",
+          updatedSummary: "Customer thanked the team",
+          newIssueSummary: "Statement is wrong",
+        },
+        classifier: {
+          category: "statement_request",
+          confidence: 0.92,
+          priority: "low",
+          summary: "Statement is wrong",
+          reason: "New issue raised in a reply",
+          escalation: { flag: false, reason: null },
+        },
+      },
+    });
+    expect(mixed).toMatchObject({ status: "processed", action: "new_linked_ticket" });
+    expect(mixed.ticketKey).not.toBe(original.ticketKey);
+
+    const [log] = await app.withTenant(wsA, (tx) =>
+      tx.select().from(schema.emailLog).where(eq(schema.emailLog.id, mixed.emailLogId)),
+    );
+    const [oldTicket] = await app.withTenant(wsA, (tx) =>
+      tx.select().from(schema.tickets).where(eq(schema.tickets.key, original.ticketKey!)),
+    );
+    const [newTicket] = await app.withTenant(wsA, (tx) =>
+      tx.select().from(schema.tickets).where(eq(schema.tickets.key, mixed.ticketKey!)),
+    );
+    expect(log).toMatchObject({
+      ticketKey: mixed.ticketKey,
+      relatedTicketId: oldTicket?.id,
+      category: "statement_request",
+    });
+    expect(newTicket?.relatedTicketIds).toContain(oldTicket?.id);
+    expect(oldTicket?.relatedTicketIds).toContain(newTicket?.id);
+    // The thanks is on the original ticket's thread.
+    const oldMessages = await app.withTenant(wsA, (tx) =>
+      tx.select().from(schema.ticketMessages).where(eq(schema.ticketMessages.ticketId, oldTicket!.id)),
+    );
+    expect(oldMessages.some((m) => m.bodyText.includes("Thanks, also my statement"))).toBe(true);
+  });
+});
+
 describe("ticket keys", () => {
   it("allocates unique, sequential keys per workspace under concurrency", async () => {
     const results = await Promise.all(

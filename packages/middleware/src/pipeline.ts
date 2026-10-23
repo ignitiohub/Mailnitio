@@ -668,7 +668,8 @@ export async function processEmail(deps: PipelineDeps, job: ProcessEmailJob): Pr
         at: clock(3),
       });
       flags.stepTicket = true;
-      action = appendTo ? "appended" : linkTo ? "new_linked_ticket" : "created_ticket";
+      // A mixed reply is appended to the old ticket and opens a new linked one; the new ticket is primary.
+      action = linkTo ? "new_linked_ticket" : "created_ticket";
       if (linkTo) {
         await deps.destination.linkRelated(tx, {
           caseId: created.id,
@@ -677,7 +678,7 @@ export async function processEmail(deps: PipelineDeps, job: ProcessEmailJob): Pr
         });
         flags.stepLinked = true;
       }
-      primary = primary ?? created;
+      primary = created;
     }
 
     const ticketDetail = created
