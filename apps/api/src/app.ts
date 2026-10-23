@@ -11,6 +11,15 @@ import { registerErrorHandling } from "./plugins/errors";
 import { createWorkspaceGuard } from "./plugins/session";
 import type { JobQueue } from "./queue";
 import { healthRoutes } from "./routes/health";
+import { customerRoutes } from "./routes/helpdesk/customers";
+import { dashboardRoutes } from "./routes/helpdesk/dashboard";
+import { emailRoutes } from "./routes/helpdesk/emails";
+import { miscRoutes } from "./routes/helpdesk/misc";
+import { peopleRoutes } from "./routes/helpdesk/people";
+import { reviewRoutes } from "./routes/helpdesk/reviews";
+import { setupRoutes } from "./routes/helpdesk/setup";
+import { simulatorRoutes } from "./routes/helpdesk/simulator";
+import { ticketRoutes } from "./routes/helpdesk/tickets";
 import { leadRoutes } from "./routes/leads";
 import { workspaceRoutes } from "./routes/workspace";
 import type { CaptchaVerifier } from "./turnstile";
@@ -51,6 +60,21 @@ export async function buildApp(deps: AppDeps) {
   await app.register(healthRoutes({ appDb: deps.appDb, version: deps.version }));
   await app.register(leadRoutes({ appDb: deps.appDb, queue: deps.queue, verifyCaptcha: deps.verifyCaptcha }));
   await app.register(workspaceRoutes({ appDb: deps.appDb, guard }));
+
+  const helpdesk = { appDb: deps.appDb, guard, queue: deps.queue };
+  for (const routes of [
+    dashboardRoutes,
+    emailRoutes,
+    ticketRoutes,
+    reviewRoutes,
+    customerRoutes,
+    setupRoutes,
+    peopleRoutes,
+    miscRoutes,
+    simulatorRoutes,
+  ]) {
+    await app.register(routes(helpdesk));
+  }
 
   return app;
 }

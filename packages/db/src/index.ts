@@ -1,3 +1,4 @@
+export type { SQL } from "drizzle-orm";
 export { and, asc, count, desc, eq, gt, gte, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
 export * from "./client";
 export * as schema from "./schema";
