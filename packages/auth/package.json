@@ -1,0 +1,23 @@
+{
+  "name": "@mailnitio/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@mailnitio/db": "workspace:*",
+    "@mailnitio/shared": "workspace:*",
+    "@mailnitio/core": "workspace:*",
+    "@mailnitio/observability": "workspace:*",
+    "better-auth": "latest",
+    "drizzle-orm": "latest",
+    "@mailnitio/crypto": "workspace:*"
+  },
+  "devDependencies": {}
+}

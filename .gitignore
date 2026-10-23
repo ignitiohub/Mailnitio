@@ -40,3 +40,10 @@ Thumbs.db
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Local development (D1)
+.vercel
+next-env.d.ts
+install.log
+.local/
+.local-*.log
